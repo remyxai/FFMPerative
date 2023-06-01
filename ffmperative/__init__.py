@@ -18,6 +18,7 @@ def ffmp(
     """
 
     tools = [
+        AudioAdjustmentTool(),
         FFProbeTool(),
         ImageDirectory2VideoTool(),
         VideoFlipTool(),
@@ -26,7 +27,8 @@ def ffmp(
         VideoSpeedTool(),
         VideoCompressionTool(),
         VideoResizeTool(),
-        AudioAdjustmentTool(),
+        VideoTrimTool(),
+        VideoFadeInTool(),
     ]
 
     ffmp = HfAgent(

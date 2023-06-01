@@ -3,6 +3,23 @@ from io import BytesIO
 from transformers import Tool
 
 
+class AudioAdjustmentTool(Tool):
+    name = "audio_adjustment_tool"
+    description = """
+    This tool modifies audio levels for an input video.
+    Inputs are input_path, level, output_path.
+    """
+    inputs = ["text", "float", "text"]
+    outputs = ["None"]
+
+    def __call__(self, input_path: str, level: float, output_path: str):
+        (
+            ffmpeg.input(input_path)
+            .output(output_path, af="volume={}".format(level))
+            .run()
+        )
+
+
 class FFProbeTool(Tool):
     name = "ffprobe_tool"
     description = """
@@ -159,19 +176,36 @@ class VideoResizeTool(Tool):
         )
 
 
-class AudioAdjustmentTool(Tool):
-    name = "audio_adjustment_tool"
+class VideoTrimTool(Tool):
+    name = "video_trim_tool"
     description = """
-    This tool modifies audio levels for an input video.
-    Inputs are input_path, level, output_path.
+    This tool trims a video. Inputs are input_path, output_path, start_time, and end_time.
+    start(end)_time: HH:MM:SS
     """
-    inputs = ["text", "float", "text"]
+    inputs = ["text", "text", "text", "text"]
     outputs = ["None"]
 
-    def __call__(self, input_path: str, level: float, output_path: str):
+    def __call__(self, input_path: str, output_path: str, start_time: str, end_time: str):
+        stream = ffmpeg.input(input_path)
+        stream = ffmpeg.trim(stream, start=start_time, end=end_time)
+        stream = ffmpeg.output(stream, output_path)
+        ffmpeg.run(stream)
+
+
+
+class VideoFadeInTool(Tool):
+    name = "video_fade_in_tool"
+    description = """
+    This tool applies a fade-in effect to a video.
+    Inputs are input_path, output_path, fade_duration.
+    """
+    inputs = ["text", "text", "integer"]
+    outputs = ["None"]
+
+    def __call__(self, input_path: str, output_path: str, fade_duration: int):
         (
             ffmpeg.input(input_path)
-            .output(output_path, af="volume={}".format(level))
+            .filter("fade", type="in", duration=fade_duration)
+            .output(output_path)
             .run()
         )
-
