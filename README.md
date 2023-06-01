@@ -33,7 +33,7 @@ ffmp(prompt="crop video '/path/to/video.mp4' to 200,200,400,400 before writing t
 ```
 
 ### CLI
-You can also call FFMperative from the command line, try:
+You can also call FFMPerative from the command line, try:
 ```bash
 ffmp do --prompt="sample the 5th frame from /path/to/video.mp4"
 ```
