@@ -1,11 +1,11 @@
 # FFMPerative
-## Devilishly Simple Video Processing
-
-Large Language Models (LLMs) with Tools can perform complex tasks from natural language prompts. Based on HuggingFace's Agents & Tools, our agent is equipped with a suite of tools for common video processing workflows like:
-
 <p align="center">
   <img src="https://github.com/remyxai/FFMPerative/blob/main/assets/mascot.png">
 </p>
+
+## Devilishly Simple Video Processing
+
+Large Language Models (LLMs) with Tools can perform complex tasks from natural language prompts. Based on HuggingFace's Agents & Tools, our agent is equipped with a suite of tools for common video processing workflows like:
 
 * Get Video Metadata
 * Extract Frame at Frame Number
