@@ -25,6 +25,7 @@ def ffmp(
         VideoCropTool(),
         VideoSpeedTool(),
         VideoCompressionTool(),
+        VideoResizeTool(),
     ]
 
     ffmp = HfAgent(

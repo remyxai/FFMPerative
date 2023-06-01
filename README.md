@@ -14,6 +14,7 @@ Large Language Models (LLMs) with Tools can perform complex tasks from natural l
 * Crop Video to Bounding Box
 * Speed Up Video by X
 * Compress a GIF/Video
+* Resize or convert a GIF/Video
 
 ## Install
 Clone this repo and install using pip
@@ -41,6 +42,7 @@ ffmp do --prompt="sample the 5th frame from /path/to/video.mp4"
 ### Roadmap
 
 - [x] Basic Video Tools
+- [ ] Release to PyPI after Agents are Added to Transformers
 - [ ] Release LLM checkpoint fine-tuned to use ffmp Tools
 
 

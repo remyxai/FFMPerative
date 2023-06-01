@@ -1,4 +1,5 @@
 import ffmpeg
+from io import BytesIO
 from transformers import Tool
 
 
@@ -68,19 +69,20 @@ class VideoFrameSampleTool(Tool):
     name = "video_frame_sample_tool"
     description = """
     This tool samples an image frame from an input video. 
-    Inputs are input_path and frame_number.
+    Inputs are input_path, frame_number, and output_path.
     """
-    inputs = ["text", "integer"]
-    outputs = ["image"]
+    inputs = ["text", "integer", "text"]
+    outputs = ["None"]
 
-    def __call__(self, input_path: str, frame_number: int):
+    def __call__(self, input_path: str, frame_number: int, output_path: str):
         out, _ = (
             ffmpeg.input(input_path)
             .filter("select", "gte(n,{})".format(frame_number))
             .output("pipe:", vframes=1, format="image2", vcodec="mjpeg")
             .run(capture_stdout=True)
         )
-        return out
+        img = Image.open(BytesIO(out))
+        img.save(output_path)
 
 
 class VideoCropTool(Tool):
@@ -138,3 +140,18 @@ class VideoCompressionTool(Tool):
             .output(output_path)
             .run()
         )
+
+
+class VideoResizeTool(Tool):
+    name = "video_resize_tool"
+    description = "This tool resizes the video to the specified dimensions."
+    inputs = ["text", "integer", "integer"]
+    outputs = ["None"]
+
+    def __call__(self, input_path: str, width: int, height: int, output_path: str):
+        (
+            ffmpeg.input(input_path)
+            .output(output_path, vf="scale={}:{}".format(width, height))
+            .run()
+        )
+
