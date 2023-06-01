@@ -9,7 +9,7 @@ Large Language Models (LLMs) with Tools can perform complex tasks from natural l
 * Horizontal/Vertical Flip
 * Crop Video to Bounding Box
 * Speed Up Video by X-factor
-* Compress a GIF
+* Compress a GIF/Video
 
 ## Install
 Clone this repo and install using pip
@@ -31,7 +31,7 @@ ffmp(prompt="crop video '/path/to/video.mp4' to 200,200,400,400 before writing t
 ### CLI
 You can also call FFMperative from the command line, try:
 ```bash
-ffmp chat --prompt="help me speed up the video /path/to/video.mp4 by 2X and save it to a file named /path/to/video_fast.mp4"
+ffmp chat --prompt="sample the 5th frame from /path/to/video.mp4"
 ```
 
 Resources:

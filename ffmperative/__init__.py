@@ -22,7 +22,7 @@ def ffmp(prompt, url_endpoint="https://api-inference.huggingface.co/models/bigco
         VideoFrameSampleTool(),
         VideoCropTool(),
         VideoSpeedTool(),
-        GIFCompressionTool(),
+        VideoCompressionTool(),
     ]
 
     ffmp = HfAgent(

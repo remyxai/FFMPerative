@@ -122,10 +122,10 @@ class VideoSpeedTool(Tool):
         ffmpeg.run(stream)
 
 
-class GIFCompressionTool(Tool):
-    name = "gif_compression_tool"
+class VideoCompressionTool(Tool):
+    name = "video_compression_tool"
     description = """
-    This tool compresses input to optimized GIF. 
+    This tool compresses input video/gif to optimized video/gif. 
     Input is input_path, output_path.
     """
     inputs = ["text", "text"]
