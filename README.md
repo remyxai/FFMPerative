@@ -1,4 +1,4 @@
-# FFMperative
+# FFMPErative
 ## Devilishly Simple Video Processing
 
 Large Language Models (LLMs) with Tools can perform complex tasks from natural language prompts. Based on HuggingFace's Agents & Tools, our agent is equipped with a suite of tools for common video processing workflows like:
@@ -33,6 +33,17 @@ You can also call FFMperative from the command line, try:
 ```bash
 ffmp chat --prompt="sample the 5th frame from /path/to/video.mp4"
 ```
+
+### Roadmap
+
+- [x] Basic Video Tools
+- [ ] Release LLM checkpoint fine-tuned to use ffmp Tools
+
+
+### Contributing
+
+* We'll gladly review pull requests aimed at improving the library of simple image and video processing tools.
+* Interested in contributing to data/templates for specializing an LLM for video processing workflows, ping us!
 
 Resources:
 * [Huggingface Transformers Agents](https://huggingface.co/docs/transformers/transformers_agents)

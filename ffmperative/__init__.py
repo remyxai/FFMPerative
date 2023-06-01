@@ -4,7 +4,9 @@ from .tools import *
 from transformers.tools import HfAgent
 
 
-def ffmp(prompt, url_endpoint="https://api-inference.huggingface.co/models/bigcode/starcoder"):
+def ffmp(
+    prompt, url_endpoint="https://api-inference.huggingface.co/models/bigcode/starcoder"
+):
     template = """
     Human tasks Assistant with a video processing workflows. Assistant uses all tools to generate an execution plan.
 
