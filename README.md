@@ -51,3 +51,4 @@ ffmp do --prompt="sample the 5th frame from /path/to/video.mp4"
 
 Resources:
 * [Huggingface Transformers Agents](https://huggingface.co/docs/transformers/transformers_agents)
+* [RemyxAI Classifier Agent](https://huggingface.co/spaces/remyxai/remyxai-classifier-labeler)
