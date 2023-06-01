@@ -114,10 +114,10 @@ class VideoSpeedTool(Tool):
     This tool speeds up a video. 
     Inputs are input_path, output_path, speed_factor.
     """
-    inputs = ["text", "text", "integer"]
+    inputs = ["text", "text", "float"]
     outputs = ["None"]
 
-    def __call__(self, input_path: str, output_path: str, speed_factor: int):
+    def __call__(self, input_path: str, output_path: str, speed_factor: float):
         stream = ffmpeg.input(input_path)
         stream = ffmpeg.setpts(stream, "1/{}*PTS".format(speed_factor))
         stream = ffmpeg.output(stream, output_path)
@@ -128,7 +128,7 @@ class VideoCompressionTool(Tool):
     name = "video_compression_tool"
     description = """
     This tool compresses input video/gif to optimized video/gif. 
-    Input is input_path, output_path.
+    Inputs are input_path, output_path.
     """
     inputs = ["text", "text"]
     outputs = ["None"]
@@ -144,14 +144,34 @@ class VideoCompressionTool(Tool):
 
 class VideoResizeTool(Tool):
     name = "video_resize_tool"
-    description = "This tool resizes the video to the specified dimensions."
-    inputs = ["text", "integer", "integer"]
+    description = """
+    This tool resizes the video to the specified dimensions.
+    Inputs are input_path, width, height, output_path.
+    """
+    inputs = ["text", "integer", "integer", "text"]
     outputs = ["None"]
 
     def __call__(self, input_path: str, width: int, height: int, output_path: str):
         (
             ffmpeg.input(input_path)
             .output(output_path, vf="scale={}:{}".format(width, height))
+            .run()
+        )
+
+
+class AudioAdjustmentTool(Tool):
+    name = "audio_adjustment_tool"
+    description = """
+    This tool modifies audio levels for an input video.
+    Inputs are input_path, level, output_path.
+    """
+    inputs = ["text", "float", "text"]
+    outputs = ["None"]
+
+    def __call__(self, input_path: str, level: float, output_path: str):
+        (
+            ffmpeg.input(input_path)
+            .output(output_path, af="volume={}".format(level))
             .run()
         )
 

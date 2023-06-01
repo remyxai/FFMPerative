@@ -15,6 +15,7 @@ Large Language Models (LLMs) with Tools can perform complex tasks from natural l
 * Speed Up Video by X
 * Compress a GIF/Video
 * Resize or convert a GIF/Video
+* Adjust Audio Levels
 
 ## Install
 Clone this repo and install using pip
