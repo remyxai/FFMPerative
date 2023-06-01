@@ -8,7 +8,7 @@ Large Language Models (LLMs) with Tools can perform complex tasks from natural l
 * Make a Video from a Directory of Images 
 * Horizontal/Vertical Flip
 * Crop Video to Bounding Box
-* Speed Up Video by X-factor
+* Speed Up Video by X
 * Compress a GIF/Video
 
 ## Install
