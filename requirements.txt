@@ -1,0 +1,11 @@
+numpy
+opencv-python
+ffmpeg-python
+huggingface_hub>=0.14.1
+transformers @ git+https://github.com/huggingface/transformers@v4.29.0
+diffusers
+accelerate
+datasets
+torch
+soundfile
+sentencepiece
