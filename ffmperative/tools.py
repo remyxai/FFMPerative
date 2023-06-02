@@ -7,12 +7,12 @@ class AudioAdjustmentTool(Tool):
     name = "audio_adjustment_tool"
     description = """
     This tool modifies audio levels for an input video.
-    Inputs are input_path, level, output_path.
+    Inputs are input_path, level (e.g. 0.5 or -13dB), output_path.
     """
-    inputs = ["text", "float", "text"]
+    inputs = ["text", "text", "text"]
     outputs = ["None"]
 
-    def __call__(self, input_path: str, level: float, output_path: str):
+    def __call__(self, input_path: str, level: str, output_path: str):
         (
             ffmpeg.input(input_path)
             .output(output_path, af="volume={}".format(level))
