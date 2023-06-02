@@ -209,3 +209,39 @@ class VideoFadeInTool(Tool):
             .output(output_path)
             .run()
         )
+
+
+class VideoReverseTool(Tool):
+    name = "video_reverse_tool"
+    description = """
+    This tool reverses a video. 
+    Inputs are input_path and output_path.
+    """
+    inputs = ["text", "text"]
+    outputs = ["None"]
+
+    def __call__(self, input_path: str, output_path: str):
+        (
+            ffmpeg.input(input_path)
+            .filter_("reverse")
+            .output(output_path)
+            .run()
+        )
+
+
+class VideoRotateTool(Tool):
+    name = "video_rotate_tool"
+    description = """
+    This tool rotates a video by a specified angle. 
+    Inputs are input_path, output_path and rotation_angle in degrees.
+    """
+    inputs = ["text", "text", "integer"]
+    outputs = ["None"]
+
+    def __call__(self, input_path: str, output_path: str, rotation_angle: int):
+        (
+            ffmpeg.input(input_path)
+            .filter_("rotate", rotation_angle)
+            .output(output_path)
+            .run()
+        )

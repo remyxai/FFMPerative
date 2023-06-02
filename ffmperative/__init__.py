@@ -29,6 +29,8 @@ def ffmp(
         VideoResizeTool(),
         VideoTrimTool(),
         VideoFadeInTool(),
+        VideoReverseTool(),
+        VideoRotateTool(),
     ]
 
     ffmp = HfAgent(
