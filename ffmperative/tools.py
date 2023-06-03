@@ -7,12 +7,12 @@ class AudioAdjustmentTool(Tool):
     name = "audio_adjustment_tool"
     description = """
     This tool modifies audio levels for an input video.
-    Inputs are input_path, level (e.g. 0.5 or -13dB), output_path.
+    Inputs are input_path, output_path, level (e.g. 0.5 or -13dB).
     """
     inputs = ["text", "text", "text"]
     outputs = ["None"]
 
-    def __call__(self, input_path: str, level: str, output_path: str):
+    def __call__(self, input_path: str, output_path: str, level: str):
         (
             ffmpeg.input(input_path)
             .output(output_path, af="volume={}".format(level))
@@ -88,10 +88,10 @@ class VideoFrameSampleTool(Tool):
     This tool samples an image frame from an input video. 
     Inputs are input_path, frame_number, and output_path.
     """
-    inputs = ["text", "integer", "text"]
+    inputs = ["text", "text", "integer"]
     outputs = ["None"]
 
-    def __call__(self, input_path: str, frame_number: int, output_path: str):
+    def __call__(self, input_path: str, output_path: str, frame_number: int):
         out, _ = (
             ffmpeg.input(input_path)
             .filter("select", "gte(n,{})".format(frame_number))
@@ -165,10 +165,10 @@ class VideoResizeTool(Tool):
     This tool resizes the video to the specified dimensions.
     Inputs are input_path, width, height, output_path.
     """
-    inputs = ["text", "integer", "integer", "text"]
+    inputs = ["text", "text", "integer", "integer"]
     outputs = ["None"]
 
-    def __call__(self, input_path: str, width: int, height: int, output_path: str):
+    def __call__(self, input_path: str, output_path: str, width: int, height: int):
         (
             ffmpeg.input(input_path)
             .output(output_path, vf="scale={}:{}".format(width, height))
@@ -243,5 +243,22 @@ class VideoRotateTool(Tool):
             ffmpeg.input(input_path)
             .filter_("rotate", rotation_angle)
             .output(output_path)
+            .run()
+        )
+
+
+class VideoSubtitleTool(Tool):
+    name = "video_subtitle_tool"
+    description = """
+    This tool adds a text overlay to a video from a .srt subtitle file. 
+    Inputs are input_path, output_path, srt_path.
+    """
+    inputs = ["text", "text", "text"]
+    outputs = ["None"]
+
+    def __call__(self, input_path: str, output_path: str, srt_path: int):
+        (
+            ffmpeg.input(input_path)
+            .output(output_path, vf="subtitles={}".format(srt_path))
             .run()
         )
