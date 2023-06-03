@@ -185,12 +185,13 @@ class VideoTrimTool(Tool):
     inputs = ["text", "text", "text", "text"]
     outputs = ["None"]
 
-    def __call__(self, input_path: str, output_path: str, start_time: str, end_time: str):
+    def __call__(
+        self, input_path: str, output_path: str, start_time: str, end_time: str
+    ):
         stream = ffmpeg.input(input_path)
         stream = ffmpeg.trim(stream, start=start_time, end=end_time)
         stream = ffmpeg.output(stream, output_path)
         ffmpeg.run(stream)
-
 
 
 class VideoFadeInTool(Tool):
@@ -221,12 +222,7 @@ class VideoReverseTool(Tool):
     outputs = ["None"]
 
     def __call__(self, input_path: str, output_path: str):
-        (
-            ffmpeg.input(input_path)
-            .filter_("reverse")
-            .output(output_path)
-            .run()
-        )
+        (ffmpeg.input(input_path).filter_("reverse").output(output_path).run())
 
 
 class VideoRotateTool(Tool):
@@ -273,12 +269,14 @@ class VideoWatermarkTool(Tool):
     inputs = ["text", "text", "text", "integer", "integer"]
     outputs = ["None"]
 
-    def __call__(self, input_path: str, output_path: str, watermark_path: int, x: int = 10, y: int = 10):
+    def __call__(
+        self,
+        input_path: str,
+        output_path: str,
+        watermark_path: int,
+        x: int = 10,
+        y: int = 10,
+    ):
         main = ffmpeg.input(input_path)
         logo = ffmpeg.input(watermark_path)
-        (
-            ffmpeg
-            .filter([main, logo], 'overlay', x, y)
-            .output(output_path)
-            .run()
-        )
+        (ffmpeg.filter([main, logo], "overlay", x, y).output(output_path).run())
