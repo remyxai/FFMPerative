@@ -105,7 +105,10 @@ class VideoFrameSampleTool(Tool):
 class VideoCropTool(Tool):
     name = "video_crop_tool"
     description = """
-    This tool crops a video with inputs: input_path, output_path, top_x, top_y, bottom_x, bottom_y.
+    This tool crops a video with inputs: 
+    input_path, output_path, 
+    top_x, top_y, 
+    bottom_x, bottom_y.
     """
     inputs = ["text", "text", "integer", "integer", "integer", "integer"]
     outputs = ["None"]
@@ -179,8 +182,8 @@ class VideoResizeTool(Tool):
 class VideoTrimTool(Tool):
     name = "video_trim_tool"
     description = """
-    This tool trims a video. Inputs are input_path, output_path, start_time, and end_time.
-    start(end)_time: HH:MM:SS
+    This tool trims a video. Inputs are input_path, output_path, 
+    start_time, and end_time. Format start(end)_time: HH:MM:SS
     """
     inputs = ["text", "text", "text", "text"]
     outputs = ["None"]
