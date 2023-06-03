@@ -32,6 +32,7 @@ def ffmp(
         VideoReverseTool(),
         VideoRotateTool(),
         VideoSubtitleTool(),
+        VideoWatermarkTool(),
     ]
 
     ffmp = HfAgent(

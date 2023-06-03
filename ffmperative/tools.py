@@ -262,3 +262,23 @@ class VideoSubtitleTool(Tool):
             .output(output_path, vf="subtitles={}".format(srt_path))
             .run()
         )
+
+
+class VideoWatermarkTool(Tool):
+    name = "video_watermark_tool"
+    description = """
+    This tool adds logo image as watermark to a video. 
+    Inputs are input_path, output_path, watermark_path.
+    """
+    inputs = ["text", "text", "text", "integer", "integer"]
+    outputs = ["None"]
+
+    def __call__(self, input_path: str, output_path: str, watermark_path: int, x: int = 10, y: int = 10):
+        main = ffmpeg.input(input_path)
+        logo = ffmpeg.input(watermark_path)
+        (
+            ffmpeg
+            .filter([main, logo], 'overlay', x, y)
+            .output(output_path)
+            .run()
+        )
