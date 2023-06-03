@@ -283,3 +283,26 @@ class VideoWatermarkTool(Tool):
         main = ffmpeg.input(input_path)
         logo = ffmpeg.input(watermark_path)
         (ffmpeg.filter([main, logo], "overlay", x, y).output(output_path).run())
+
+
+class VideoHTTPServerTool(Tool):
+    name = "video_http_server_tool"
+    description = """
+    This tool streams a source video to an HTTP server. 
+    Inputs are input_path and server_url.
+    """
+    inputs = ["text", "text"]
+    outputs = ["None"]
+
+    def __call__(self, input_path: str, server_url: str = "http://localhost:8080"):
+        process = (
+            ffmpeg.input(input_path)
+            .output(
+                server_url,
+                codec="copy",  # use same codecs of the original video
+                listen=1,  # enables HTTP server
+                f="flv",
+            )  # ffplay -f flv http://localhost:8080
+            .global_args("-re")  # argument to act as a live stream
+            .run()
+        )
