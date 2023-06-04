@@ -250,10 +250,10 @@ class VideoRotateTool(Tool):
         )
 
 
-class VideoSubtitleTool(Tool):
-    name = "video_subtitle_tool"
+class VideoCaptionTool(Tool):
+    name = "video_caption_tool"
     description = """
-    This tool adds a text overlay to a video from a .srt subtitle file. 
+    This tool subtitles/captions a video with a text overlay from a .srt subtitle file. 
     Inputs are input_path, output_path, srt_path.
     """
     inputs = ["text", "text", "text"]

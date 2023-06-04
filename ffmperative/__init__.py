@@ -31,7 +31,7 @@ def ffmp(
         VideoFadeInTool(),
         VideoReverseTool(),
         VideoRotateTool(),
-        VideoSubtitleTool(),
+        VideoCaptionTool(),
         VideoWatermarkTool(),
         VideoHTTPServerTool(),
     ]
