@@ -18,6 +18,11 @@ Large Language Models (LLMs) with Tools can perform complex tasks from natural l
 * Adjust Audio Levels
 
 ## Install
+Ensure you have ffmpeg installed. On Debian, you can use:
+```bash
+sudo apt-get install ffmpeg
+```
+
 Clone this repo and install using pip
 ```
 git clone https://github.com/remyxai/FFMPerative.git 
