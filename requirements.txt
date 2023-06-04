@@ -1,4 +1,5 @@
 numpy
+pillow
 opencv-python
 ffmpeg-python
 huggingface_hub>=0.14.1

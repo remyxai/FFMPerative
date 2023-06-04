@@ -1,5 +1,6 @@
 import ffmpeg
 from io import BytesIO
+from PIL import Image
 from transformers import Tool
 
 
