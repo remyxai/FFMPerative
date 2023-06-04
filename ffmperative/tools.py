@@ -25,6 +25,7 @@ class FFProbeTool(Tool):
     name = "ffprobe_tool"
     description = """
     This tool extracts metadata from input video using ffmpeg/ffprobe
+    Input is input_path.
     """
     inputs = ["text"]
     outputs = ["text"]
@@ -56,7 +57,9 @@ class ImageDirectory2VideoTool(Tool):
     ):
         (
             ffmpeg.input(
-                input_path + "/*" + extension, pattern_type="glob", framerate=framerate
+                input_path.rstrip("/") + "/*." + extension.lstrip("."),
+                pattern_type="glob",
+                framerate=framerate,
             )
             .output(output_path)
             .run()
