@@ -23,7 +23,7 @@ Ensure you have ffmpeg installed. On Debian, you can use:
 sudo apt-get install ffmpeg
 ```
 
-#### Pypi
+#### PyPI
 Install from pypi with:
 ```
 pip install ffmperative
