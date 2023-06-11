@@ -1,3 +1,4 @@
+import json
 import ffmpeg
 from io import BytesIO
 from PIL import Image
@@ -9,9 +10,10 @@ class AudioAdjustmentTool(Tool):
     description = """
     This tool modifies audio levels for an input video.
     Inputs are input_path, output_path, level (e.g. 0.5 or -13dB).
+    Output is the output_path.
     """
     inputs = ["text", "text", "text"]
-    outputs = ["None"]
+    outputs = ["text"]
 
     def __call__(self, input_path: str, output_path: str, level: str):
         (
@@ -19,6 +21,7 @@ class AudioAdjustmentTool(Tool):
             .output(output_path, af="volume={}".format(level))
             .run()
         )
+        return output_path
 
 
 class FFProbeTool(Tool):
@@ -26,27 +29,29 @@ class FFProbeTool(Tool):
     description = """
     This tool extracts metadata from input video using ffmpeg/ffprobe
     Input is input_path.
+    Output is video metadata as a string.
     """
     inputs = ["text"]
     outputs = ["text"]
 
     def __call__(self, input_path: str):
         probe = ffmpeg.probe(input_path)
-        return next(
+        return json.dumps(next(
             (stream for stream in probe["streams"] if stream["codec_type"] == "video"),
             None,
-        )
+        ), indent=2)
 
 
-class ImageDirectory2VideoTool(Tool):
+class ImageDirectoryToVideoTool(Tool):
     name = "image_directory_video_tool"
     description = """
     This tool creates video
     from a directory of images. Inputs
-    are input_path and output_path.
+    are input_path and output_path. 
+    Output is the output_path.
     """
     inputs = ["text", "text"]
-    outputs = ["None"]
+    outputs = ["text"]
 
     def __call__(
         self,
@@ -64,6 +69,7 @@ class ImageDirectory2VideoTool(Tool):
             .output(output_path)
             .run()
         )
+        return output_path
 
 
 class VideoFlipTool(Tool):
@@ -71,10 +77,10 @@ class VideoFlipTool(Tool):
     description = """
     This tool flips video along the horizontal 
     or vertical axis. Inputs are input_path, 
-    output_path and orientation.
+    output_path and orientation. Output is output_path.
     """
     inputs = ["text", "text", "text"]
-    outputs = ["None"]
+    outputs = ["text"]
 
     def __call__(
         self, input_path: str, output_path: str, orientation: str = "vertical"
@@ -84,26 +90,29 @@ class VideoFlipTool(Tool):
         stream = flip(stream)
         stream = ffmpeg.output(stream, output_path)
         ffmpeg.run(stream)
+        return output_path
 
 
 class VideoFrameSampleTool(Tool):
     name = "video_frame_sample_tool"
     description = """
     This tool samples an image frame from an input video. 
-    Inputs are input_path, frame_number, and output_path.
+    Inputs are input_path, output_path, and frame_number.
+    Output is the output_path.
     """
-    inputs = ["text", "text", "integer"]
-    outputs = ["None"]
+    inputs = ["text", "text", "text"]
+    outputs = ["text"]
 
     def __call__(self, input_path: str, output_path: str, frame_number: int):
         out, _ = (
             ffmpeg.input(input_path)
-            .filter("select", "gte(n,{})".format(frame_number))
+            .filter("select", "gte(n,{})".format(str(frame_number)))
             .output("pipe:", vframes=1, format="image2", vcodec="mjpeg")
             .run(capture_stdout=True)
         )
         img = Image.open(BytesIO(out))
         img.save(output_path)
+        return output_path
 
 
 class VideoCropTool(Tool):
@@ -113,39 +122,43 @@ class VideoCropTool(Tool):
     input_path, output_path, 
     top_x, top_y, 
     bottom_x, bottom_y.
+    Output is the output_path.
     """
-    inputs = ["text", "text", "integer", "integer", "integer", "integer"]
-    outputs = ["None"]
+    inputs = ["text", "text", "text", "text", "text", "text"]
+    outputs = ["text"]
 
     def __call__(
         self,
         input_path: str,
         output_path: str,
-        top_x: int,
-        top_y: int,
-        bottom_x: int,
-        bottom_y: int,
+        top_x: str,
+        top_y: str,
+        bottom_x: str,
+        bottom_y: str,
     ):
         stream = ffmpeg.input(input_path)
-        stream = ffmpeg.crop(stream, top_y, top_x, bottom_y - top_y, bottom_x - top_x)
+        stream = ffmpeg.crop(stream, int(top_y), int(top_x), int(bottom_y) - int(top_y), int(bottom_x) - int(top_x))
         stream = ffmpeg.output(stream, output_path)
         ffmpeg.run(stream)
+        return output_path
 
 
 class VideoSpeedTool(Tool):
     name = "video_speed_tool"
     description = """
     This tool speeds up a video. 
-    Inputs are input_path, output_path, speed_factor.
+    Inputs are input_path as a string, output_path as a string, speed_factor (float) as a string.
+    Output is the output_path.
     """
-    inputs = ["text", "text", "float"]
-    outputs = ["None"]
+    inputs = ["text", "text", "text"]
+    outputs = ["text"]
 
     def __call__(self, input_path: str, output_path: str, speed_factor: float):
         stream = ffmpeg.input(input_path)
-        stream = ffmpeg.setpts(stream, "1/{}*PTS".format(speed_factor))
+        stream = ffmpeg.setpts(stream, "1/{}*PTS".format(float(speed_factor)))
         stream = ffmpeg.output(stream, output_path)
         ffmpeg.run(stream)
+        return output_path
 
 
 class VideoCompressionTool(Tool):
@@ -153,9 +166,10 @@ class VideoCompressionTool(Tool):
     description = """
     This tool compresses input video/gif to optimized video/gif. 
     Inputs are input_path, output_path.
+    Output is output_path.
     """
     inputs = ["text", "text"]
-    outputs = ["None"]
+    outputs = ["text"]
 
     def __call__(self, input_path: str, output_path: str):
         (
@@ -164,6 +178,7 @@ class VideoCompressionTool(Tool):
             .output(output_path)
             .run()
         )
+        return output_path
 
 
 class VideoResizeTool(Tool):

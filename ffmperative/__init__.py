@@ -20,7 +20,7 @@ def ffmp(
     tools = [
         AudioAdjustmentTool(),
         FFProbeTool(),
-        ImageDirectory2VideoTool(),
+        ImageDirectoryToVideoTool(),
         VideoFlipTool(),
         VideoFrameSampleTool(),
         VideoCropTool(),

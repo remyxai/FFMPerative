@@ -23,6 +23,13 @@ Ensure you have ffmpeg installed. On Debian, you can use:
 sudo apt-get install ffmpeg
 ```
 
+#### Pypi
+Install from pypi with:
+```
+pip install ffmperative
+```
+
+#### Install from source
 Clone this repo and install using pip
 ```
 git clone https://github.com/remyxai/FFMPerative.git 
@@ -48,7 +55,7 @@ ffmp do --prompt="sample the 5th frame from /path/to/video.mp4"
 ### Roadmap
 
 - [x] Basic Video Tools
-- [ ] Release to PyPI after Agents are Added to Transformers
+- [x] Release to PyPI after Agents are Added to Transformers
 - [ ] Release LLM checkpoint fine-tuned to use ffmp Tools
 
 
