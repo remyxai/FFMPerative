@@ -227,11 +227,19 @@ class VideoTrimTool(Tool):
 
     def __call__(
         self, input_path: str, output_path: str, start_time: str, end_time: str
-    ):
+    ):                                  
         stream = ffmpeg.input(input_path)
-        stream = ffmpeg.trim(stream, start=start_time, end=end_time)
-        stream = ffmpeg.output(stream, output_path)
-        ffmpeg.run(stream)
+        v = stream.trim(start=start_time, end=end_time).setpts("PTS-STARTPTS")         
+        a = stream.filter_("atrim", start=start_time, end=end_time).filter_(
+            "asetpts", "PTS-STARTPTS"    
+        )
+        joined = ffmpeg.concat(v, a, v=1, a=1).node
+        out = ffmpeg.output(          
+            joined[0],
+            joined[1],
+            output_path,
+        )
+        out.run()
 
 
 class VideoFadeInTool(Tool):
