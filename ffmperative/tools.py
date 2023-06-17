@@ -4,6 +4,7 @@ from io import BytesIO
 from PIL import Image
 from transformers import Tool
 
+from .utils import modify_file_name
 
 class AudioAdjustmentTool(Tool):
     name = "audio_adjustment_tool"
@@ -19,6 +20,7 @@ class AudioAdjustmentTool(Tool):
         (
             ffmpeg.input(input_path)
             .output(output_path, af="volume={}".format(level))
+            .overwrite_output()
             .run()
         )
         return output_path
@@ -58,8 +60,13 @@ class ImageDirectoryToVideoTool(Tool):
         input_path: str,
         output_path: str,
         framerate: int = 25,
-        extension: str = "jpg",
+        extension: str = "jpg"
     ):
+        # Check for valid extension
+        valid_extensions = ["jpg", "png", "jpeg"]
+        if extension not in valid_extensions:
+            raise ValueError(f"Invalid extension {extension}. Must be one of {valid_extensions}")
+
         (
             ffmpeg.input(
                 input_path.rstrip("/") + "/*." + extension.lstrip("."),
@@ -67,6 +74,7 @@ class ImageDirectoryToVideoTool(Tool):
                 framerate=framerate,
             )
             .output(output_path)
+            .overwrite_output()
             .run()
         )
         return output_path
@@ -83,8 +91,13 @@ class VideoFlipTool(Tool):
     outputs = ["text"]
 
     def __call__(
-        self, input_path: str, output_path: str, orientation: str = "vertical"
+        self, input_path: str, output_path: str, orientation: str = "horizontal"
     ):
+        # Check for valid orientation
+        valid_orientations = ["horizontal", "vertical"]
+        if orientation not in valid_orientations:
+            raise ValueError(f"Invalid orientation {orientation}. Must be one of {valid_orientations}")
+
         flip = ffmpeg.vflip if orientation == "vertical" else ffmpeg.hflip
         stream = ffmpeg.input(input_path)
         stream = flip(stream)
@@ -172,10 +185,14 @@ class VideoCompressionTool(Tool):
     outputs = ["text"]
 
     def __call__(self, input_path: str, output_path: str):
+        if input_path == output_path:
+            # Slightly change path to avoid overwriting input file
+            output_path = modify_file_name(output_path, "compressed_")
         (
             ffmpeg.input(input_path)
             .filter_("split", "[0:v] split [a][b];[a] palettegen [p];[b][p] paletteuse")
             .output(output_path)
+            .overwrite_output()
             .run()
         )
         return output_path
@@ -194,6 +211,7 @@ class VideoResizeTool(Tool):
         (
             ffmpeg.input(input_path)
             .output(output_path, vf="scale={}:{}".format(width, height))
+            .overwrite_output()
             .run()
         )
 
@@ -230,6 +248,7 @@ class VideoFadeInTool(Tool):
             ffmpeg.input(input_path)
             .filter("fade", type="in", duration=fade_duration)
             .output(output_path)
+            .overwrite_output()
             .run()
         )
 
@@ -244,7 +263,13 @@ class VideoReverseTool(Tool):
     outputs = ["None"]
 
     def __call__(self, input_path: str, output_path: str):
-        (ffmpeg.input(input_path).filter_("reverse").output(output_path).run())
+        (
+            ffmpeg.input(input_path)
+            .filter_("reverse")
+            .output(output_path)
+            .overwrite_output()
+            .run()
+        )
 
 
 class VideoRotateTool(Tool):
@@ -261,6 +286,7 @@ class VideoRotateTool(Tool):
             ffmpeg.input(input_path)
             .filter_("rotate", rotation_angle)
             .output(output_path)
+            .overwrite_output()
             .run()
         )
 
@@ -274,10 +300,14 @@ class VideoCaptionTool(Tool):
     inputs = ["text", "text", "text"]
     outputs = ["None"]
 
-    def __call__(self, input_path: str, output_path: str, srt_path: int):
+    def __call__(self, input_path: str, output_path: str, srt_path: str):
+        if input_path == output_path:
+            # Slightly change path to avoid overwriting input file
+            output_path = modify_file_name(output_path, "cap_")
         (
             ffmpeg.input(input_path)
             .output(output_path, vf="subtitles={}".format(srt_path))
+            .overwrite_output()
             .run()
         )
 
@@ -295,13 +325,18 @@ class VideoWatermarkTool(Tool):
         self,
         input_path: str,
         output_path: str,
-        watermark_path: int,
+        watermark_path: str,
         x: int = 10,
         y: int = 10,
     ):
         main = ffmpeg.input(input_path)
         logo = ffmpeg.input(watermark_path)
-        (ffmpeg.filter([main, logo], "overlay", x, y).output(output_path).run())
+        (
+            ffmpeg.filter([main, logo], "overlay", x, y)
+            .output(output_path)
+            .overwrite_output()
+            .run()
+        )
 
 
 class VideoHTTPServerTool(Tool):
@@ -323,5 +358,6 @@ class VideoHTTPServerTool(Tool):
                 f="flv",
             )  # ffplay -f flv http://localhost:8080
             .global_args("-re")  # argument to act as a live stream
+            .overwrite_output()
             .run()
         )

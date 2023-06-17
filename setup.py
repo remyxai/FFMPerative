@@ -11,9 +11,9 @@ def read_requirements(file):
 
 setup(
     name="ffmperative",
-    version="0.0.1",
+    version="0.0.2",
     packages=find_packages(),
-    install_requires=read_requirements('requirements.txt'),
+    install_requires=read_requirements((this_directory / 'requirements.txt')),
     entry_points={
         "console_scripts": [
             "ffmp=ffmperative.cli:main",
