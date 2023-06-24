@@ -6,6 +6,10 @@ from transformers import Tool
 
 from .utils import modify_file_name
 
+import demucs.separate
+from scenedetect import detect, ContentDetector, split_video_ffmpeg
+
+
 class AudioAdjustmentTool(Tool):
     name = "audio_adjustment_tool"
     description = """
@@ -26,6 +30,22 @@ class AudioAdjustmentTool(Tool):
         return output_path
 
 
+class AudioDemuxTool(Tool):
+    name = "audio_demux_tool"
+    description = """
+    This tool performs music source separation to demux vocals
+    from audio, good for kareoke or filtering background noise. 
+    Inputs are input_path.
+    """
+    inputs = ["text"]
+    outputs = ["None"]
+
+    def __call__(self, input_path: str):
+        demucs.separate.main(
+            ["--mp3", "--two-stems", "vocals", "-n", "mdx_extra", input_path]
+        )
+
+
 class FFProbeTool(Tool):
     name = "ffprobe_tool"
     description = """
@@ -38,10 +58,17 @@ class FFProbeTool(Tool):
 
     def __call__(self, input_path: str):
         probe = ffmpeg.probe(input_path)
-        return json.dumps(next(
-            (stream for stream in probe["streams"] if stream["codec_type"] == "video"),
-            None,
-        ), indent=2)
+        return json.dumps(
+            next(
+                (
+                    stream
+                    for stream in probe["streams"]
+                    if stream["codec_type"] == "video"
+                ),
+                None,
+            ),
+            indent=2,
+        )
 
 
 class ImageDirectoryToVideoTool(Tool):
@@ -60,12 +87,14 @@ class ImageDirectoryToVideoTool(Tool):
         input_path: str,
         output_path: str,
         framerate: int = 25,
-        extension: str = "jpg"
+        extension: str = "jpg",
     ):
         # Check for valid extension
         valid_extensions = ["jpg", "png", "jpeg"]
         if extension not in valid_extensions:
-            raise ValueError(f"Invalid extension {extension}. Must be one of {valid_extensions}")
+            raise ValueError(
+                f"Invalid extension {extension}. Must be one of {valid_extensions}"
+            )
 
         (
             ffmpeg.input(
@@ -96,7 +125,9 @@ class VideoFlipTool(Tool):
         # Check for valid orientation
         valid_orientations = ["horizontal", "vertical"]
         if orientation not in valid_orientations:
-            raise ValueError(f"Invalid orientation {orientation}. Must be one of {valid_orientations}")
+            raise ValueError(
+                f"Invalid orientation {orientation}. Must be one of {valid_orientations}"
+            )
 
         flip = ffmpeg.vflip if orientation == "vertical" else ffmpeg.hflip
         stream = ffmpeg.input(input_path)
@@ -150,7 +181,13 @@ class VideoCropTool(Tool):
         bottom_y: str,
     ):
         stream = ffmpeg.input(input_path)
-        stream = ffmpeg.crop(stream, int(top_y), int(top_x), int(bottom_y) - int(top_y), int(bottom_x) - int(top_x))
+        stream = ffmpeg.crop(
+            stream,
+            int(top_y),
+            int(top_x),
+            int(bottom_y) - int(top_y),
+            int(bottom_x) - int(top_x),
+        )
         stream = ffmpeg.output(stream, output_path)
         ffmpeg.run(stream)
         return output_path
@@ -227,18 +264,30 @@ class VideoTrimTool(Tool):
 
     def __call__(
         self, input_path: str, output_path: str, start_time: str, end_time: str
-    ):                                  
+    ):
         stream = ffmpeg.input(input_path)
-        v = stream.trim(start=start_time, end=end_time).setpts("PTS-STARTPTS")         
-        a = stream.filter_("atrim", start=start_time, end=end_time).filter_(
-            "asetpts", "PTS-STARTPTS"    
-        )
-        joined = ffmpeg.concat(v, a, v=1, a=1).node
-        out = ffmpeg.output(          
-            joined[0],
-            joined[1],
-            output_path,
-        )
+        v = stream.trim(start=start_time, end=end_time).setpts("PTS-STARTPTS")
+        probe = ffmpeg.probe(input_path)
+        audio_stream = False
+        for in_stream in probe["streams"]:
+            if in_stream["codec_type"] == "audio":
+                audio_stream = True
+
+        if audio_stream:
+            a = stream.filter_("atrim", start=start_time, end=end_time).filter_(
+                "asetpts", "PTS-STARTPTS"
+            )
+            joined = ffmpeg.concat(v, a, v=1, a=1).node
+            out = ffmpeg.output(
+                joined[0],
+                joined[1],
+                output_path,
+            )
+        else:
+            out = ffmpeg.output(
+                v,
+                output_path,
+            )
         out.run()
 
 
@@ -369,3 +418,76 @@ class VideoHTTPServerTool(Tool):
             .overwrite_output()
             .run()
         )
+
+
+class VideoLetterBoxingTool(Tool):
+    name = "video_letterboxing_tool"
+    description = """
+    This tool adds letterboxing to a video.
+    Inputs are input_path, output_path.
+    """
+    inputs = ["text", "text"]
+    outputs = ["None"]
+
+    def __call__(self, input_path: str, output_path: str):
+        probe = ffmpeg.probe(input_path)
+        video_info = next(
+            (stream for stream in probe["streams"] if stream["codec_type"] == "video"),
+            None,
+        )
+        width = video_info["width"]
+        height = video_info["height"]
+
+        # Check if the video is in portrait mode
+        if height >= width:
+            (
+                ffmpeg.input(input_path)
+                .output(
+                    output_path,
+                    vf="scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:-1:-1:color=black",
+                )
+                .run()
+            )
+
+
+class VideoStabilizationTool(Tool):
+    name = "video_stabilization_tool"
+    description = """
+    This tool stabilizes a video.
+    Inputs are input_path, output_path, smoothing, zoom.
+    """
+    inputs = ["text", "text", "integer", "integer", "integer"]
+    outputs = ["None"]
+
+    def __call__(self, input_path: str, output_path: str, smoothing: int = 10, zoom: int = 0, shakiness: int = 5):
+        (
+            ffmpeg.input(input_path)
+            .output("null", vf="vidstabdetect=shakiness={}".format(shakiness), f="null")
+            .overwrite_output()
+            .run(capture_stdout=True, capture_stderr=True)
+        )
+        (
+            ffmpeg.input(input_path)
+            .output(
+                output_path,
+                vf="vidstabtransform=smoothing={}:zoom={}:input={}".format(
+                    smoothing, zoom, "transforms.trf"
+                ),
+            )
+            .overwrite_output()
+            .run()
+        )
+
+
+class VideoSceneSplitTool(Tool):
+    name = "scene_split_tool"
+    description = """
+    This tool performs scene detection and splitting. 
+    Inputs are input_path.
+    """
+    inputs = ["text"]
+    outputs = ["None"]
+
+    def __call__(self, input_path: str):
+        scene_list = detect(input_path, ContentDetector())
+        split_video_ffmpeg(input_path, scene_list)
