@@ -478,6 +478,26 @@ class VideoStabilizationTool(Tool):
             .run()
         )
 
+class VideoOverlayTool(Tool):
+    name = "video_overlay_tool"
+    description = """
+    This tool overlays one video on top of another.
+    Inputs are main_video_path, overlay_video_path, output_path, x_position, y_position.
+    """
+    inputs = ["text", "text", "text", "integer", "integer"]
+    outputs = ["None"]
+
+    def __call__(self, main_video_path: str, overlay_video_path: str, output_path: str, x_position: int, y_position: int):
+        main = ffmpeg.input(main_video_path)
+        overlay = ffmpeg.input(overlay_video_path)
+
+        (
+            ffmpeg.output(
+                ffmpeg.overlay(main, overlay, x=x_position, y=y_position), output_path
+            ).overwrite_output()
+            .run()
+        )
+
 
 class VideoSceneSplitTool(Tool):
     name = "scene_split_tool"
