@@ -498,6 +498,24 @@ class VideoOverlayTool(Tool):
             .run()
         )
 
+class ImageToVideoTool(Tool):
+    name = "image_to_video_tool"
+    description = """
+    This tool generates an N-second video clip from an image.
+    Inputs are image_path, duration, output_path.
+    """
+    inputs = ["text", "integer", "text"]
+    outputs = ["None"]
+
+    def __call__(self, image_path: str, duration: int, output_path: str):
+        (
+            ffmpeg
+            .input(image_path, loop=1, t=duration, framerate=24) # assuming 24 fps
+            .output(output_path, vcodec='libx264')
+            .overwrite_output()
+            .run()
+        )
+
 
 class VideoSceneSplitTool(Tool):
     name = "scene_split_tool"
