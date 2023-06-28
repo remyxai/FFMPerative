@@ -76,7 +76,7 @@ Try composing complex edits like transcription-based highlight curation [using L
 ## Features
 
 ### CLI
-Run FFMPerative from the command line like:
+Run FFMPerative from the command-line:
 ```bash
 ffmp do -p "sample the 5th frame from /path/to/video.mp4"
 ```
