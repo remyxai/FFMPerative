@@ -1,6 +1,6 @@
 # FFMPerative
 <p align="center">
-  <img src="https://github.com/remyxai/FFMPerative/blob/main/assets/mascot.png" style="max-width:30%">
+  <img src="https://github.com/remyxai/FFMPerative/blob/main/assets/mascot.png" height=200px>
 </p>
 
 ## Devilishly Simple Video Processing
