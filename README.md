@@ -5,16 +5,16 @@
 
 ## Devilishly Simple Video Processing
 
-Large Language Models (LLMs) with Tools can perform complex tasks from natural language prompts. Based on HuggingFace's Agents & Tools, our agent is equipped with tools for common video processing workflows like:
+Large Language Models (LLMs) with Tools can perform complex tasks from natural language prompts. Using HuggingFace's Agents & Tools, FFMPerative is specialized to common video processing workflows like:
 
 * Get Video Metadata
-* Speed Up Video by X
-* Extract Image at Frame Number
+* Sample Image from Video
+* Change Video Playback Speed
 * Make a Video from a Directory of Images 
 * Resize, Flip, Crop, Compress Video/GIF
-* Adjust Audio Levels, Background Noise removal
-* Render Picture-in-Picture
-* Split Video by scene
+* Adjust Audio Levels, Background Noise Removal
+* Overlay Video for Picture-in-Picture
+* Split Video with Scene Detection
 
 ## Prerequisites 
 
@@ -28,7 +28,7 @@ tar xf ffmpeg-git-amd64-static.tar.xz -C ffmpeg --strip-components 1
 
 Make sure to update your PATH variable:
 
-`export PATH=$PATH:~/ffmpeg`
+`export PATH=$PATH:/path/to/ffmpeg`
 
 
 ## Installation
@@ -69,7 +69,7 @@ Another common workflow, adding closed-captioning:
 ffmp("merge subtitles '/path/to/captions.srt' with video '/path/to/my_video.mp4' calling it '/path/to/my_video_captioned.mp4'")
 ```
 
-Try composing complex edits like transcription-based highlight curation [using LLMs](https://blog.remyx.ai/posts/data-processing-agents/):
+With more compositition, you can even curate highlights from long form video based on transcription [using LLMs](https://blog.remyx.ai/posts/data-processing-agents/):
 
 ![smart_trim](https://blog.remyx.ai/img/ffmperative-auto-edit-pipeline.png#center)
 
