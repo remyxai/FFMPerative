@@ -5,20 +5,20 @@
 
 ## Devilishly Simple Video Processing
 
-Large Language Models (LLMs) with Tools can perform complex tasks from natural language prompts. Based on HuggingFace's Agents & Tools, our agent is equipped with a suite of tools for common video processing workflows like:
+Large Language Models (LLMs) with Tools can perform complex tasks from natural language prompts. Based on HuggingFace's Agents & Tools, our agent is equipped with tools for common video processing workflows like:
 
 * Get Video Metadata
 * Speed Up Video by X
-* Extract Frame at Frame Number
+* Extract Image at Frame Number
 * Make a Video from a Directory of Images 
 * Resize, Flip, Crop, Compress Video/GIF
 * Adjust Audio Levels, Background Noise removal
+* Render Picture-in-Picture
 * Split Video by scene
-* Picture-in-Picture
 
 ## Prerequisites 
 
-Some tools use additional options of a [special build](https://johnvansickle.com/ffmpeg/) of FFmpeg. 
+Some tools require additional options of a [special build](https://johnvansickle.com/ffmpeg/) of FFmpeg. 
 
 ```bash
 mkdir ffmpeg
@@ -39,7 +39,7 @@ Install from pypi with:
 pip install ffmperative
 ```
 
-#### Install from source
+#### From Source
 Clone this repo and install using pip
 ```
 git clone https://github.com/remyxai/FFMPerative.git 
