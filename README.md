@@ -69,7 +69,7 @@ Another common workflow, adding closed-captioning:
 ffmp("merge subtitles '/path/to/captions.srt' with video '/path/to/my_video.mp4' calling it '/path/to/my_video_captioned.mp4'")
 ```
 
-With more compositition, you can even curate highlights from long form video based on transcription [using LLMs](https://blog.remyx.ai/posts/data-processing-agents/):
+With more compositition, you can even curate highlights from long-form video by analyzing Speech-To-Text transcriptions [with LLMs](https://blog.remyx.ai/posts/data-processing-agents/):
 
 ![smart_trim](https://blog.remyx.ai/img/ffmperative-auto-edit-pipeline.png#center)
 
