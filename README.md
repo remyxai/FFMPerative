@@ -37,7 +37,7 @@ docker build -t ffmp .
 
 ### Run FFMPerative in a Container
 ```
-docker run -it -v /path/to/dir:/path/to/dir --net=host ffmp:latest
+docker run -it -v /path/to/dir:/path/to/dir ffmp:latest
 ```
 
 ## Quickstart
