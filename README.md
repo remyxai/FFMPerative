@@ -16,35 +16,28 @@ Large Language Models (LLMs) with Tools can perform complex tasks from natural l
 * Overlay Video for Picture-in-Picture
 * Split Video with Scene Detection
 
-## Prerequisites 
-
-Some tools require additional options of a [special build](https://johnvansickle.com/ffmpeg/) of FFmpeg. 
-
-```bash
-mkdir ffmpeg
-wget https://johnvansickle.com/ffmpeg/builds/ffmpeg-git-amd64-static.tar.xz
-tar xf ffmpeg-git-amd64-static.tar.xz -C ffmpeg --strip-components 1
-```
-
-Make sure to update your PATH variable:
-
-`export PATH=$PATH:/path/to/ffmpeg`
-
-
 ## Installation
 
-#### PyPI
-Install from pypi with:
+#### Clone the Repo
 ```
-pip install ffmperative
+git clone https://github.com/remyxai/FFMPerative.git
+cd FFMPerative
 ```
 
-#### From Source
-Clone this repo and install using pip
+#### Use in Docker
+Pull an existing image with:
 ```
-git clone https://github.com/remyxai/FFMPerative.git 
-cd FFMPerative/
-pip install .
+docker pull smellslikeml/ffmp:latest
+```
+
+Or build with the `Dockerfile`:
+```
+docker build -t ffmp .
+```
+
+### Run FFMPerative in a Container
+```
+docker run -it -v /path/to/dir:/path/to/dir --net=host ffmp:latest
 ```
 
 ## Quickstart
