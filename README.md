@@ -33,9 +33,8 @@ docker build -t ffmp .
 
 ### Run FFMPerative in a Container
 ```
-docker run -it -v /path/to/dir:/path/to/dir ffmp:latest
+docker run -it -e HUGGINGFACE_TOKEN='YOUR_HF_TOKEN' -v /path/to/dir:/path/to/dir ffmp:latest "YOUR PROMPT"
 ```
-Make sure to set your token with `huggingface-cli login`.
 
 ## Quickstart
 

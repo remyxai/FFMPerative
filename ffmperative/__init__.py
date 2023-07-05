@@ -25,6 +25,7 @@ def ffmp(
         ImageDirectoryToVideoTool(),
         ImageToVideoTool(),
         ImageZoomPanTool(),
+        SpeechToSubtitleTool(),
         VideoAutoCropTool(),
         VideoCaptionTool(),
         VideoCropTool(),
