@@ -39,6 +39,7 @@ docker build -t ffmp .
 ```
 docker run -it -v /path/to/dir:/path/to/dir ffmp:latest
 ```
+Make sure to set your token with `huggingface-cli login`.
 
 ## Quickstart
 
