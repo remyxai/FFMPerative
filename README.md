@@ -72,7 +72,7 @@ With more compositition, you can even curate highlights from long-form video by 
 ### CLI
 Run FFMPerative from the command-line:
 ```bash
-ffmp do -p "sample the 5th frame from /path/to/video.mp4"
+ffmp do --p "sample the 5th frame from /path/to/video.mp4"
 ```
 
 ### Notebooks
