@@ -39,6 +39,7 @@ def ffmp(
         VideoSegmentDeleteTool(),
         VideoSpeedTool(),
         VideoStabilizationTool(),
+        VideoStackTool(),
         VideoTrimTool(),
         VideoTransitionTool(),
         VideoWatermarkTool(),

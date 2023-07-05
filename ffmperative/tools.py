@@ -60,11 +60,10 @@ class AudioVideoMuxTool(Tool):
         input_video = ffmpeg.input(input_path)
         added_audio = ffmpeg.input(audio_path)
 
-        merged_audio = ffmpeg.filter([input_video.audio, added_audio], 'amix')
+        merged_audio = ffmpeg.filter([input_video.audio, added_audio], "amix")
 
         (
-            ffmpeg
-            .concat(input_video, merged_audio, v=1, a=1)
+            ffmpeg.concat(input_video, merged_audio, v=1, a=1)
             .output(output_path)
             .run(overwrite_output=True)
         )
@@ -506,6 +505,31 @@ class VideoStabilizationTool(Tool):
         )
 
 
+class VideoStackTool(Tool):
+    name = "video_stack_tool"
+    description = """
+    This tool stacks two videos either vertically or horizontally based on the orientation parameter.
+    Inputs are input_path, second_input, output_path, and orientation as strings.
+    Output is the output_path.
+    vertical orientation -> vstack, horizontal orientation -> hstack
+    """
+    inputs = ["text", "text", "text", "text"]
+    outputs = ["None"]
+
+    def __call__(
+        self, input_path: str, second_input: str, output_path: str, orientation: str
+    ):
+        video1 = ffmpeg.input(input_path)
+        video2 = ffmpeg.input(second_input)
+
+        if orientation.lower() not in ["vstack", "hstack"]:
+            raise ValueError("Orientation must be either 'vstack' or 'hstack'.")
+
+        stacked = ffmpeg.filter((video1, video2), orientation)
+        out = ffmpeg.output(stacked, output_path)
+        out.run(overwrite_output=True)
+
+
 class VideoTransitionTool(Tool):
     name = "xfade_transition_tool"
     description = """
@@ -532,7 +556,7 @@ class VideoTransitionTool(Tool):
                     transition_type, duration, offset
                 ),
             )
-            .global_args('-i', input_path2)
+            .global_args("-i", input_path2)
             .run()
         )
 
