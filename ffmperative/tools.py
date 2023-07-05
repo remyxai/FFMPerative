@@ -583,7 +583,7 @@ class VideoSegmentDeleteTool(Tool):
         )
 
 
-class VideoTransitionTool:
+class VideoTransitionTool(Tool):
     name = "xfade_transition_tool"
     description = """
     This tool applies a xfade filter transitions between two videos.
@@ -603,7 +603,7 @@ class VideoTransitionTool:
     ):
         (
             ffmpeg.input(input_path1)
-            .input(input_path2)
+            .global_args('-i', input_path2)
             .output(
                 output_path,
                 filter_complex="xfade=transition={}:duration={}:offset={}".format(
