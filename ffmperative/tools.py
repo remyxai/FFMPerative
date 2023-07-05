@@ -1,7 +1,10 @@
+import re
 import json
 import ffmpeg
+import subprocess
 from io import BytesIO
 from PIL import Image
+from collections import Counter
 from transformers import Tool
 
 from .utils import modify_file_name
@@ -167,6 +170,62 @@ class ImageZoomPanTool(Tool):
             .output(output_path, vf="zoompan=z='zoom+0.001':d={}".format(zoom_factor))
             .run()
         )
+
+
+class VideoAutoCropTool(Tool):
+    name = "auto_crop_tool"
+    description = """
+    This tool automatically crops a video.
+    Inputs are input_path as a string and output_path as a string.
+    Output is the output_path.
+    """
+    inputs = ["text", "text"]
+    outputs = ["None"]
+
+    def __call__(self, input_path: str, output_path: str):
+        probe = ffmpeg.probe(input_path)
+        duration = next(
+            (stream for stream in probe["streams"] if stream["codec_type"] == "video"),
+            None,
+        )["duration"]
+        duration = float(duration)
+        samples = [duration * i / 4 for i in range(1, 4)]
+
+        crop_params_list = []
+        for sample in samples:
+            ffmpeg_command = [
+                "ffmpeg",
+                "-i",
+                input_path,
+                "-vf",
+                "cropdetect=24:16:0",
+                "-vframes",
+                "1",
+                "-ss",
+                str(sample),
+                "-f",
+                "null",
+                "-",
+            ]
+
+            pipe = subprocess.Popen(ffmpeg_command, stderr=subprocess.PIPE)
+            out, err = pipe.communicate()
+            crop_match = re.search(r"crop=(\d+:\d+:\d+:\d+)", err.decode("utf-8"))
+
+            if not crop_match:
+                continue
+
+            crop_params = crop_match.group(1)
+            crop_params_list.append(crop_params)
+
+        if not crop_params_list:
+            raise ValueError("Could not find crop parameters in any sample frames.")
+
+        most_common_crop_params = Counter(crop_params_list).most_common(1)[0][0]
+        w, h, x, y = map(int, most_common_crop_params.split(":"))
+        ffmpeg.input(input_path).output(
+            output_path, vf="crop={}:{}:{}:{}".format(w, h, x, y)
+        ).run(overwrite_output=True)
 
 
 class VideoCaptionTool(Tool):
