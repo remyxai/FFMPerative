@@ -11,7 +11,7 @@ Large Language Models (LLMs) with Tools can perform complex tasks from natural l
 * Sample Image from Video
 * Change Video Playback Speed
 * Make a Video from a Directory of Images 
-* Resize, Flip, Crop, Compress Video/GIF
+* Resize, Crop, Flip, Reverse Video/GIF
 * Adjust Audio Levels, Background Noise Removal
 * Overlay Video for Picture-in-Picture
 * Split Video with Scene Detection

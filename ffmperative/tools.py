@@ -46,6 +46,30 @@ class AudioDemuxTool(Tool):
         )
 
 
+class AudioVideoMuxTool(Tool):
+    name = "audio_video_mux_tool"
+    description = """
+    This tool muxes (combines) a video and an audio file.
+    Inputs are input_path as a string, audio_path as a string, and output_path as a string.
+    Output is the output_path.
+    """
+    inputs = ["text", "text", "text"]
+    outputs = ["None"]
+
+    def __call__(self, input_path: str, audio_path: str, output_path: str):
+        input_video = ffmpeg.input(input_path)
+        added_audio = ffmpeg.input(audio_path)
+
+        merged_audio = ffmpeg.filter([input_video.audio, added_audio], 'amix')
+
+        (
+            ffmpeg
+            .concat(input_video, merged_audio, v=1, a=1)
+            .output(output_path)
+            .run(overwrite_output=True)
+        )
+
+
 class FFProbeTool(Tool):
     name = "ffprobe_tool"
     description = """
@@ -71,19 +95,22 @@ class FFProbeTool(Tool):
         )
 
 
-class ImageZoomPanTool(Tool):
-    name = "image_zoompan_tool"
+class ImageToVideoTool(Tool):
+    name = "image_to_video_tool"
     description = """
-    This tool applies the Ken Burns effect with zoompan filter on image for video.
-    Inputs are input_path, output_path, zoom_factor.
+    This tool generates an N-second video clip from an image.
+    Inputs are image_path, duration, output_path.
     """
-    inputs = ["text", "text", "integer"]
+    inputs = ["text", "integer", "text"]
     outputs = ["None"]
 
-    def __call__(self, input_path: str, output_path: str, zoom_factor: int = 25):
+    def __call__(self, image_path: str, duration: int, output_path: str):
         (
-            ffmpeg.input(input_path)
-            .output(output_path, vf="zoompan=z='zoom+0.001':d={}".format(zoom_factor))
+            ffmpeg.input(
+                image_path, loop=1, t=duration, framerate=24
+            )  # assuming 24 fps
+            .output(output_path, vcodec="libx264")
+            .overwrite_output()
             .run()
         )
 
@@ -123,6 +150,78 @@ class ImageDirectoryToVideoTool(Tool):
             .overwrite_output()
             .run()
         )
+        return output_path
+
+
+class ImageZoomPanTool(Tool):
+    name = "image_zoompan_tool"
+    description = """
+    This tool applies the Ken Burns effect with zoompan filter on image for video.
+    Inputs are input_path, output_path, zoom_factor.
+    """
+    inputs = ["text", "text", "integer"]
+    outputs = ["None"]
+
+    def __call__(self, input_path: str, output_path: str, zoom_factor: int = 25):
+        (
+            ffmpeg.input(input_path)
+            .output(output_path, vf="zoompan=z='zoom+0.001':d={}".format(zoom_factor))
+            .run()
+        )
+
+
+class VideoCaptionTool(Tool):
+    name = "video_caption_tool"
+    description = """
+    This tool subtitles/captions a video with a text overlay from a .srt subtitle file. 
+    Inputs are input_path, output_path, srt_path.
+    """
+    inputs = ["text", "text", "text"]
+    outputs = ["None"]
+
+    def __call__(self, input_path: str, output_path: str, srt_path: str):
+        if input_path == output_path:
+            # Slightly change path to avoid overwriting input file
+            output_path = modify_file_name(output_path, "cap_")
+        (
+            ffmpeg.input(input_path)
+            .output(output_path, vf="subtitles={}".format(srt_path))
+            .overwrite_output()
+            .run()
+        )
+
+
+class VideoCropTool(Tool):
+    name = "video_crop_tool"
+    description = """
+    This tool crops a video with inputs: 
+    input_path, output_path, 
+    top_x, top_y, 
+    bottom_x, bottom_y.
+    Output is the output_path.
+    """
+    inputs = ["text", "text", "text", "text", "text", "text"]
+    outputs = ["text"]
+
+    def __call__(
+        self,
+        input_path: str,
+        output_path: str,
+        top_x: str,
+        top_y: str,
+        bottom_x: str,
+        bottom_y: str,
+    ):
+        stream = ffmpeg.input(input_path)
+        stream = ffmpeg.crop(
+            stream,
+            int(top_y),
+            int(top_x),
+            int(bottom_y) - int(top_y),
+            int(bottom_x) - int(top_x),
+        )
+        stream = ffmpeg.output(stream, output_path)
+        ffmpeg.run(stream)
         return output_path
 
 
@@ -174,236 +273,6 @@ class VideoFrameSampleTool(Tool):
         img = Image.open(BytesIO(out))
         img.save(output_path)
         return output_path
-
-
-class VideoCropTool(Tool):
-    name = "video_crop_tool"
-    description = """
-    This tool crops a video with inputs: 
-    input_path, output_path, 
-    top_x, top_y, 
-    bottom_x, bottom_y.
-    Output is the output_path.
-    """
-    inputs = ["text", "text", "text", "text", "text", "text"]
-    outputs = ["text"]
-
-    def __call__(
-        self,
-        input_path: str,
-        output_path: str,
-        top_x: str,
-        top_y: str,
-        bottom_x: str,
-        bottom_y: str,
-    ):
-        stream = ffmpeg.input(input_path)
-        stream = ffmpeg.crop(
-            stream,
-            int(top_y),
-            int(top_x),
-            int(bottom_y) - int(top_y),
-            int(bottom_x) - int(top_x),
-        )
-        stream = ffmpeg.output(stream, output_path)
-        ffmpeg.run(stream)
-        return output_path
-
-
-class VideoSpeedTool(Tool):
-    name = "video_speed_tool"
-    description = """
-    This tool speeds up a video. 
-    Inputs are input_path as a string, output_path as a string, speed_factor (float) as a string.
-    Output is the output_path.
-    """
-    inputs = ["text", "text", "text"]
-    outputs = ["text"]
-
-    def __call__(self, input_path: str, output_path: str, speed_factor: float):
-        stream = ffmpeg.input(input_path)
-        stream = ffmpeg.setpts(stream, "1/{}*PTS".format(float(speed_factor)))
-        stream = ffmpeg.output(stream, output_path)
-        ffmpeg.run(stream)
-        return output_path
-
-
-class VideoCompressionTool(Tool):
-    name = "video_compression_tool"
-    description = """
-    This tool compresses input video/gif to optimized video/gif. 
-    Inputs are input_path, output_path.
-    Output is output_path.
-    """
-    inputs = ["text", "text"]
-    outputs = ["text"]
-
-    def __call__(self, input_path: str, output_path: str):
-        if input_path == output_path:
-            # Slightly change path to avoid overwriting input file
-            output_path = modify_file_name(output_path, "compressed_")
-        (
-            ffmpeg.input(input_path)
-            .filter_("split", "[0:v] split [a][b];[a] palettegen [p];[b][p] paletteuse")
-            .output(output_path)
-            .overwrite_output()
-            .run()
-        )
-        return output_path
-
-
-class VideoResizeTool(Tool):
-    name = "video_resize_tool"
-    description = """
-    This tool resizes the video to the specified dimensions.
-    Inputs are input_path, width, height, output_path.
-    """
-    inputs = ["text", "text", "integer", "integer"]
-    outputs = ["None"]
-
-    def __call__(self, input_path: str, output_path: str, width: int, height: int):
-        (
-            ffmpeg.input(input_path)
-            .output(output_path, vf="scale={}:{}".format(width, height))
-            .overwrite_output()
-            .run()
-        )
-
-
-class VideoTrimTool(Tool):
-    name = "video_trim_tool"
-    description = """
-    This tool trims a video. Inputs are input_path, output_path, 
-    start_time, and end_time. Format start(end)_time: HH:MM:SS
-    """
-    inputs = ["text", "text", "text", "text"]
-    outputs = ["None"]
-
-    def __call__(
-        self, input_path: str, output_path: str, start_time: str, end_time: str
-    ):
-        stream = ffmpeg.input(input_path)
-        v = stream.trim(start=start_time, end=end_time).setpts("PTS-STARTPTS")
-        probe = ffmpeg.probe(input_path)
-        audio_stream = False
-        for in_stream in probe["streams"]:
-            if in_stream["codec_type"] == "audio":
-                audio_stream = True
-
-        if audio_stream:
-            a = stream.filter_("atrim", start=start_time, end=end_time).filter_(
-                "asetpts", "PTS-STARTPTS"
-            )
-            joined = ffmpeg.concat(v, a, v=1, a=1).node
-            out = ffmpeg.output(joined[0], joined[1], output_path)
-        else:
-            out = ffmpeg.output(v, output_path)
-        out.run()
-
-
-class VideoFadeInTool(Tool):
-    name = "video_fade_in_tool"
-    description = """
-    This tool applies a fade-in effect to a video.
-    Inputs are input_path, output_path, fade_duration.
-    """
-    inputs = ["text", "text", "integer"]
-    outputs = ["None"]
-
-    def __call__(self, input_path: str, output_path: str, fade_duration: int):
-        (
-            ffmpeg.input(input_path)
-            .filter("fade", type="in", duration=fade_duration)
-            .output(output_path)
-            .overwrite_output()
-            .run()
-        )
-
-
-class VideoReverseTool(Tool):
-    name = "video_reverse_tool"
-    description = """
-    This tool reverses a video. 
-    Inputs are input_path and output_path.
-    """
-    inputs = ["text", "text"]
-    outputs = ["None"]
-
-    def __call__(self, input_path: str, output_path: str):
-        (
-            ffmpeg.input(input_path)
-            .filter_("reverse")
-            .output(output_path)
-            .overwrite_output()
-            .run()
-        )
-
-
-class VideoRotateTool(Tool):
-    name = "video_rotate_tool"
-    description = """
-    This tool rotates a video by a specified angle. 
-    Inputs are input_path, output_path and rotation_angle in degrees.
-    """
-    inputs = ["text", "text", "integer"]
-    outputs = ["None"]
-
-    def __call__(self, input_path: str, output_path: str, rotation_angle: int):
-        (
-            ffmpeg.input(input_path)
-            .filter_("rotate", rotation_angle)
-            .output(output_path)
-            .overwrite_output()
-            .run()
-        )
-
-
-class VideoCaptionTool(Tool):
-    name = "video_caption_tool"
-    description = """
-    This tool subtitles/captions a video with a text overlay from a .srt subtitle file. 
-    Inputs are input_path, output_path, srt_path.
-    """
-    inputs = ["text", "text", "text"]
-    outputs = ["None"]
-
-    def __call__(self, input_path: str, output_path: str, srt_path: str):
-        if input_path == output_path:
-            # Slightly change path to avoid overwriting input file
-            output_path = modify_file_name(output_path, "cap_")
-        (
-            ffmpeg.input(input_path)
-            .output(output_path, vf="subtitles={}".format(srt_path))
-            .overwrite_output()
-            .run()
-        )
-
-
-class VideoWatermarkTool(Tool):
-    name = "video_watermark_tool"
-    description = """
-    This tool adds logo image as watermark to a video. 
-    Inputs are input_path, output_path, watermark_path.
-    """
-    inputs = ["text", "text", "text", "integer", "integer"]
-    outputs = ["None"]
-
-    def __call__(
-        self,
-        input_path: str,
-        output_path: str,
-        watermark_path: str,
-        x: int = 10,
-        y: int = 10,
-    ):
-        main = ffmpeg.input(input_path)
-        logo = ffmpeg.input(watermark_path)
-        (
-            ffmpeg.filter([main, logo], "overlay", x, y)
-            .output(output_path)
-            .overwrite_output()
-            .run()
-        )
 
 
 class VideoHTTPServerTool(Tool):
@@ -460,42 +329,6 @@ class VideoLetterBoxingTool(Tool):
             )
 
 
-class VideoStabilizationTool(Tool):
-    name = "video_stabilization_tool"
-    description = """
-    This tool stabilizes a video.
-    Inputs are input_path, output_path, smoothing, zoom.
-    """
-    inputs = ["text", "text", "integer", "integer", "integer"]
-    outputs = ["None"]
-
-    def __call__(
-        self,
-        input_path: str,
-        output_path: str,
-        smoothing: int = 10,
-        zoom: int = 0,
-        shakiness: int = 5,
-    ):
-        (
-            ffmpeg.input(input_path)
-            .output("null", vf="vidstabdetect=shakiness={}".format(shakiness), f="null")
-            .overwrite_output()
-            .run(capture_stdout=True, capture_stderr=True)
-        )
-        (
-            ffmpeg.input(input_path)
-            .output(
-                output_path,
-                vf="vidstabtransform=smoothing={}:zoom={}:input={}".format(
-                    smoothing, zoom, "transforms.trf"
-                ),
-            )
-            .overwrite_output()
-            .run()
-        )
-
-
 class VideoOverlayTool(Tool):
     name = "video_overlay_tool"
     description = """
@@ -525,21 +358,57 @@ class VideoOverlayTool(Tool):
         )
 
 
-class ImageToVideoTool(Tool):
-    name = "image_to_video_tool"
+class VideoReverseTool(Tool):
+    name = "video_reverse_tool"
     description = """
-    This tool generates an N-second video clip from an image.
-    Inputs are image_path, duration, output_path.
+    This tool reverses a video. 
+    Inputs are input_path and output_path.
     """
-    inputs = ["text", "integer", "text"]
+    inputs = ["text", "text"]
     outputs = ["None"]
 
-    def __call__(self, image_path: str, duration: int, output_path: str):
+    def __call__(self, input_path: str, output_path: str):
         (
-            ffmpeg.input(
-                image_path, loop=1, t=duration, framerate=24
-            )  # assuming 24 fps
-            .output(output_path, vcodec="libx264")
+            ffmpeg.input(input_path)
+            .filter_("reverse")
+            .output(output_path)
+            .overwrite_output()
+            .run()
+        )
+
+
+class VideoResizeTool(Tool):
+    name = "video_resize_tool"
+    description = """
+    This tool resizes the video to the specified dimensions.
+    Inputs are input_path, width, height, output_path.
+    """
+    inputs = ["text", "text", "integer", "integer"]
+    outputs = ["None"]
+
+    def __call__(self, input_path: str, output_path: str, width: int, height: int):
+        (
+            ffmpeg.input(input_path)
+            .output(output_path, vf="scale={}:{}".format(width, height))
+            .overwrite_output()
+            .run()
+        )
+
+
+class VideoRotateTool(Tool):
+    name = "video_rotate_tool"
+    description = """
+    This tool rotates a video by a specified angle. 
+    Inputs are input_path, output_path and rotation_angle in degrees.
+    """
+    inputs = ["text", "text", "integer"]
+    outputs = ["None"]
+
+    def __call__(self, input_path: str, output_path: str, rotation_angle: int):
+        (
+            ffmpeg.input(input_path)
+            .filter_("rotate", rotation_angle)
+            .output(output_path)
             .overwrite_output()
             .run()
         )
@@ -583,6 +452,60 @@ class VideoSegmentDeleteTool(Tool):
         )
 
 
+class VideoSpeedTool(Tool):
+    name = "video_speed_tool"
+    description = """
+    This tool speeds up a video. 
+    Inputs are input_path as a string, output_path as a string, speed_factor (float) as a string.
+    Output is the output_path.
+    """
+    inputs = ["text", "text", "text"]
+    outputs = ["text"]
+
+    def __call__(self, input_path: str, output_path: str, speed_factor: float):
+        stream = ffmpeg.input(input_path)
+        stream = ffmpeg.setpts(stream, "1/{}*PTS".format(float(speed_factor)))
+        stream = ffmpeg.output(stream, output_path)
+        ffmpeg.run(stream)
+        return output_path
+
+
+class VideoStabilizationTool(Tool):
+    name = "video_stabilization_tool"
+    description = """
+    This tool stabilizes a video.
+    Inputs are input_path, output_path, smoothing, zoom.
+    """
+    inputs = ["text", "text", "integer", "integer", "integer"]
+    outputs = ["None"]
+
+    def __call__(
+        self,
+        input_path: str,
+        output_path: str,
+        smoothing: int = 10,
+        zoom: int = 0,
+        shakiness: int = 5,
+    ):
+        (
+            ffmpeg.input(input_path)
+            .output("null", vf="vidstabdetect=shakiness={}".format(shakiness), f="null")
+            .overwrite_output()
+            .run(capture_stdout=True, capture_stderr=True)
+        )
+        (
+            ffmpeg.input(input_path)
+            .output(
+                output_path,
+                vf="vidstabtransform=smoothing={}:zoom={}:input={}".format(
+                    smoothing, zoom, "transforms.trf"
+                ),
+            )
+            .overwrite_output()
+            .run()
+        )
+
+
 class VideoTransitionTool(Tool):
     name = "xfade_transition_tool"
     description = """
@@ -610,5 +533,63 @@ class VideoTransitionTool(Tool):
                 ),
             )
             .global_args('-i', input_path2)
+            .run()
+        )
+
+
+class VideoTrimTool(Tool):
+    name = "video_trim_tool"
+    description = """
+    This tool trims a video. Inputs are input_path, output_path, 
+    start_time, and end_time. Format start(end)_time: HH:MM:SS
+    """
+    inputs = ["text", "text", "text", "text"]
+    outputs = ["None"]
+
+    def __call__(
+        self, input_path: str, output_path: str, start_time: str, end_time: str
+    ):
+        stream = ffmpeg.input(input_path)
+        v = stream.trim(start=start_time, end=end_time).setpts("PTS-STARTPTS")
+        probe = ffmpeg.probe(input_path)
+        audio_stream = False
+        for in_stream in probe["streams"]:
+            if in_stream["codec_type"] == "audio":
+                audio_stream = True
+
+        if audio_stream:
+            a = stream.filter_("atrim", start=start_time, end=end_time).filter_(
+                "asetpts", "PTS-STARTPTS"
+            )
+            joined = ffmpeg.concat(v, a, v=1, a=1).node
+            out = ffmpeg.output(joined[0], joined[1], output_path)
+        else:
+            out = ffmpeg.output(v, output_path)
+        out.run()
+
+
+class VideoWatermarkTool(Tool):
+    name = "video_watermark_tool"
+    description = """
+    This tool adds logo image as watermark to a video. 
+    Inputs are input_path, output_path, watermark_path.
+    """
+    inputs = ["text", "text", "text", "integer", "integer"]
+    outputs = ["None"]
+
+    def __call__(
+        self,
+        input_path: str,
+        output_path: str,
+        watermark_path: str,
+        x: int = 10,
+        y: int = 10,
+    ):
+        main = ffmpeg.input(input_path)
+        logo = ffmpeg.input(watermark_path)
+        (
+            ffmpeg.filter([main, logo], "overlay", x, y)
+            .output(output_path)
+            .overwrite_output()
             .run()
         )
