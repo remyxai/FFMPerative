@@ -1,6 +1,6 @@
 FROM jrottenberg/ffmpeg:6.0-ubuntu
 
-RUN apt-get update && apt-get upgrade -y && apt-get install libsndfile1
+RUN apt-get update && apt-get upgrade -y && apt-get install libsndfile1 -y
 
 RUN apt-get install -y python3 python3-pip
 
