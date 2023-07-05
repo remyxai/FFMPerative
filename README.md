@@ -24,7 +24,7 @@ Pull an image from DockerHub:
 docker pull smellslikeml/ffmp:latest
 ```
 
-Or clone this repo and build and image with the `Dockerfile`:
+Or clone this repo and build an image with the `Dockerfile`:
 ```
 git clone https://github.com/remyxai/FFMPerative.git
 cd FFMPerative
