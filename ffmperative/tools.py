@@ -603,12 +603,12 @@ class VideoTransitionTool(Tool):
     ):
         (
             ffmpeg.input(input_path1)
-            .global_args('-i', input_path2)
             .output(
                 output_path,
                 filter_complex="xfade=transition={}:duration={}:offset={}".format(
-                    fade_type, duration, offset
+                    transition_type, duration, offset
                 ),
             )
+            .global_args('-i', input_path2)
             .run()
         )
