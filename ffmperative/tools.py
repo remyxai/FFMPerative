@@ -71,6 +71,23 @@ class FFProbeTool(Tool):
         )
 
 
+class ImageZoomPanTool(Tool):
+    name = "image_zoompan_tool"
+    description = """
+    This tool applies the Ken Burns effect with zoompan filter on image for video.
+    Inputs are input_path, output_path, zoom_factor.
+    """
+    inputs = ["text", "text", "integer"]
+    outputs = ["None"]
+
+    def __call__(self, input_path: str, output_path: str, zoom_factor: int = 25):
+        (
+            ffmpeg.input(input_path)
+            .output(output_path, vf="zoompan=z='zoom+0.001':d={}".format(zoom_factor))
+            .run()
+        )
+
+
 class ImageDirectoryToVideoTool(Tool):
     name = "image_directory_video_tool"
     description = """
@@ -278,16 +295,9 @@ class VideoTrimTool(Tool):
                 "asetpts", "PTS-STARTPTS"
             )
             joined = ffmpeg.concat(v, a, v=1, a=1).node
-            out = ffmpeg.output(
-                joined[0],
-                joined[1],
-                output_path,
-            )
+            out = ffmpeg.output(joined[0], joined[1], output_path)
         else:
-            out = ffmpeg.output(
-                v,
-                output_path,
-            )
+            out = ffmpeg.output(v, output_path)
         out.run()
 
 
@@ -459,7 +469,14 @@ class VideoStabilizationTool(Tool):
     inputs = ["text", "text", "integer", "integer", "integer"]
     outputs = ["None"]
 
-    def __call__(self, input_path: str, output_path: str, smoothing: int = 10, zoom: int = 0, shakiness: int = 5):
+    def __call__(
+        self,
+        input_path: str,
+        output_path: str,
+        smoothing: int = 10,
+        zoom: int = 0,
+        shakiness: int = 5,
+    ):
         (
             ffmpeg.input(input_path)
             .output("null", vf="vidstabdetect=shakiness={}".format(shakiness), f="null")
@@ -478,6 +495,7 @@ class VideoStabilizationTool(Tool):
             .run()
         )
 
+
 class VideoOverlayTool(Tool):
     name = "video_overlay_tool"
     description = """
@@ -487,16 +505,25 @@ class VideoOverlayTool(Tool):
     inputs = ["text", "text", "text", "integer", "integer"]
     outputs = ["None"]
 
-    def __call__(self, main_video_path: str, overlay_video_path: str, output_path: str, x_position: int, y_position: int):
+    def __call__(
+        self,
+        main_video_path: str,
+        overlay_video_path: str,
+        output_path: str,
+        x_position: int,
+        y_position: int,
+    ):
         main = ffmpeg.input(main_video_path)
         overlay = ffmpeg.input(overlay_video_path)
 
         (
             ffmpeg.output(
                 ffmpeg.overlay(main, overlay, x=x_position, y=y_position), output_path
-            ).overwrite_output()
+            )
+            .overwrite_output()
             .run()
         )
+
 
 class ImageToVideoTool(Tool):
     name = "image_to_video_tool"
@@ -509,9 +536,10 @@ class ImageToVideoTool(Tool):
 
     def __call__(self, image_path: str, duration: int, output_path: str):
         (
-            ffmpeg
-            .input(image_path, loop=1, t=duration, framerate=24) # assuming 24 fps
-            .output(output_path, vcodec='libx264')
+            ffmpeg.input(
+                image_path, loop=1, t=duration, framerate=24
+            )  # assuming 24 fps
+            .output(output_path, vcodec="libx264")
             .overwrite_output()
             .run()
         )
@@ -529,3 +557,58 @@ class VideoSceneSplitTool(Tool):
     def __call__(self, input_path: str):
         scene_list = detect(input_path, ContentDetector())
         split_video_ffmpeg(input_path, scene_list)
+
+
+class VideoSegmentDeleteTool(Tool):
+    name = "segment_delete_tool"
+    description = """
+    This tool deletes a interval of video by timestamp.
+    Inputs are input_path, output_path, start, end.
+    Format start/end as float.
+    """
+    inputs = ["text", "text", "float", "float"]
+    outputs = ["None"]
+
+    def __call__(self, input_path: str, output_path: str, start: float, end: float):
+        (
+            ffmpeg.input(input_path)
+            .output(
+                output_path,
+                vf="select='not(between(t,{},{}))',setpts=N/FRAME_RATE/TB".format(
+                    start, end
+                ),
+                af="aselect='not(between(t,{},{}))',asetpts=N/SR/TB".format(start, end),
+            )
+            .run()
+        )
+
+
+class VideoTransitionTool:
+    name = "xfade_transition_tool"
+    description = """
+    This tool applies a xfade filter transitions between two videos.
+    Inputs are input_path1, input_path2, output_path, transition_type, duration, and offset.
+    """
+    inputs = ["text", "text", "text", "text", "float", "float"]
+    outputs = ["None"]
+
+    def __call__(
+        self,
+        input_path1: str,
+        input_path2: str,
+        output_path: str,
+        transition_type: str,
+        duration: float,
+        offset: float,
+    ):
+        (
+            ffmpeg.input(input_path1)
+            .input(input_path2)
+            .output(
+                output_path,
+                filter_complex="xfade=transition={}:duration={}:offset={}".format(
+                    fade_type, duration, offset
+                ),
+            )
+            .run()
+        )

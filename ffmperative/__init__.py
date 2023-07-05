@@ -22,6 +22,7 @@ def ffmp(
         AudioDemuxTool(),
         FFProbeTool(),
         ImageDirectoryToVideoTool(),
+        ImageZoomPanTool(),
         VideoFlipTool(),
         VideoFrameSampleTool(),
         VideoCropTool(),
@@ -33,8 +34,10 @@ def ffmp(
         VideoLetterBoxingTool(),
         VideoFadeInTool(),
         VideoStabilizationTool(),
+        VideoSegmentDeleteTool(),
         VideoReverseTool(),
         VideoRotateTool(),
+        VideoTransitionTool(),
         VideoCaptionTool(),
         VideoOverlayTool(),
         ImageToVideoTool(),
@@ -42,8 +45,5 @@ def ffmp(
         VideoHTTPServerTool(),
     ]
 
-    ffmp = HfAgent(
-        url_endpoint,
-        additional_tools=tools,
-    )
+    ffmp = HfAgent(url_endpoint, additional_tools=tools)
     return ffmp.run(prompt, run_prompt_template=template)
