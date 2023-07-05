@@ -16,22 +16,18 @@ Large Language Models (LLMs) with Tools can perform complex tasks from natural l
 * Overlay Video for Picture-in-Picture
 * Split Video with Scene Detection
 
-## Installation
+## Setup 
 
-#### Clone the Repo
-```
-git clone https://github.com/remyxai/FFMPerative.git
-cd FFMPerative
-```
-
-#### Use in Docker
-Pull an existing image with:
+#### Get the Docker Image
+Pull an image from DockerHub:
 ```
 docker pull smellslikeml/ffmp:latest
 ```
 
-Or build with the `Dockerfile`:
+Or clone this repo and build and image with the `Dockerfile`:
 ```
+git clone https://github.com/remyxai/FFMPerative.git
+cd FFMPerative
 docker build -t ffmp .
 ```
 
@@ -43,7 +39,7 @@ Make sure to set your token with `huggingface-cli login`.
 
 ## Quickstart
 
-Getting started is easy, import ffmp from the library and specify your edit in simple terms.
+Editing video with FFMPerative is simple, import the library and declare what you want done.
 
 ```python
 from ffmperative import ffmp
@@ -51,7 +47,7 @@ from ffmperative import ffmp
 ffmp("sample the 5th frame from '/path/to/video.mp4'")
 ```
 
-Besides sampling a frame from a clip, we can split a long video into short clips with scene detection:
+As above, you can sample a frame from a video clip. You can also split a long video into short clips via scene detection:
 
 ```python
 ffmp("split the video '/path/to/my_video.mp4' by scene")
@@ -63,7 +59,7 @@ Another common workflow, adding closed-captioning:
 ffmp("merge subtitles '/path/to/captions.srt' with video '/path/to/my_video.mp4' calling it '/path/to/my_video_captioned.mp4'")
 ```
 
-With more compositition, you can even curate highlights from long-form video by analyzing Speech-To-Text transcriptions [with LLMs](https://blog.remyx.ai/posts/data-processing-agents/):
+By compositition, you can even curate highlights from long-form video by analyzing speech transcripts [with LLMs](https://blog.remyx.ai/posts/data-processing-agents/):
 
 ![smart_trim](https://blog.remyx.ai/img/ffmperative-auto-edit-pipeline.png#center)
 
@@ -84,6 +80,7 @@ ffmp do --p "sample the 5th frame from /path/to/video.mp4"
 - [x] Basic Video Tools
 - [x] Release to PyPI after Agents are Added to Transformers
 - [x] Add ML-enabled Tools: [demucs](https://github.com/facebookresearch/demucs), [PySceneDetect](https://github.com/Breakthrough/PySceneDetect) 
+- [x] Docker Image with Latest FFmpeg
 - [ ] Release LLM checkpoint fine-tuned to use ffmp Tools
 
 
