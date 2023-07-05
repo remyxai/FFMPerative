@@ -3,7 +3,7 @@
   <img src="https://github.com/remyxai/FFMPerative/blob/main/assets/ffmperative.gif" height=400px>
 </p>
 
-## Devilishly Simple Video Processing
+## Video Production at the Speed of Chat
 
 Large Language Models (LLMs) with Tools can perform complex tasks from natural language prompts. Using HuggingFace's Agents & Tools, FFMPerative is specialized to common video processing workflows like:
 
