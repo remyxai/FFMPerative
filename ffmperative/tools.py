@@ -13,7 +13,7 @@ from pathlib import Path
 from collections import Counter
 from transformers import Tool
 
-from .utils import modify_file_name
+from .utils import modify_file_name, probe_video, get_video_info, has_audio
 
 import whisperx
 import demucs.separate
@@ -91,18 +91,8 @@ class FFProbeTool(Tool):
     outputs = ["text"]
 
     def __call__(self, input_path: str):
-        probe = ffmpeg.probe(input_path)
-        return json.dumps(
-            next(
-                (
-                    stream
-                    for stream in probe["streams"]
-                    if stream["codec_type"] == "video"
-                ),
-                None,
-            ),
-            indent=2,
-        )
+        video_info = get_video_info(input_path)
+        return json.dumps(video_info, indent=2) if video_info else None
 
 
 class ImageToVideoTool(Tool):
@@ -111,14 +101,14 @@ class ImageToVideoTool(Tool):
     This tool generates an N-second video clip from an image.
     Inputs are image_path, duration, output_path.
     """
-    inputs = ["text", "integer", "text"]
+    inputs = ["text", "text", "integer", "integer"]
     outputs = ["None"]
 
-    def __call__(self, image_path: str, duration: int, output_path: str):
+    def __call__(
+        self, image_path: str, output_path: str, duration: int, framerate: int = 24
+    ):
         (
-            ffmpeg.input(
-                image_path, loop=1, t=duration, framerate=24
-            )  # assuming 24 fps
+            ffmpeg.input(image_path, loop=1, t=duration, framerate=framerate)
             .output(output_path, vcodec="libx264")
             .overwrite_output()
             .run()
@@ -140,7 +130,7 @@ class ImageDirectoryToVideoTool(Tool):
         self,
         input_path: str,
         output_path: str,
-        framerate: int = 25,
+        framerate: int = 24,
         extension: str = "jpg",
     ):
         # Check for valid extension
@@ -303,13 +293,8 @@ class VideoAutoCropTool(Tool):
     outputs = ["None"]
 
     def __call__(self, input_path: str, output_path: str):
-        probe = ffmpeg.probe(input_path)
-        duration = next(
-            (stream for stream in probe["streams"] if stream["codec_type"] == "video"),
-            None,
-        )["duration"]
-        duration = float(duration)
-        samples = [duration * i / 4 for i in range(1, 4)]
+        video_info = get_video_info(input_path)
+        samples = [float(video_info["duration"]) * i / 4 for i in range(1, 4)]
 
         crop_params_list = []
         for sample in samples:
@@ -449,8 +434,7 @@ class VideoFrameClassifierTool(Tool):
     outputs = ["None"]
 
     def get_video_size(self, filename):
-        probe = ffmpeg.probe(filename)
-        video_info = next(s for s in probe["streams"] if s["codec_type"] == "video")
+        video_info = get_video_info(filename)
         width = int(video_info["width"])
         height = int(video_info["height"])
         return width, height
@@ -535,9 +519,8 @@ class VideoGopChunkerTool(Tool):
     def __call__(self, input_path, segment_length):
         basename = Path(input_path).stem
         output_dir = Path(input_path).parent
-        probe = ffmpeg.probe(input_path)
-        duration = float(probe["format"]["duration"])
-        num_segments = math.ceil(duration / segment_length)
+        video_info = get_video_info(input_path)
+        num_segments = math.ceil(float(video_info["duration"]) / segment_length)
         num_digits = len(str(num_segments))
         filename_pattern = f"{output_dir}/{basename}_%0{num_digits}d.mp4"
 
@@ -584,11 +567,7 @@ class VideoLetterBoxingTool(Tool):
     outputs = ["None"]
 
     def __call__(self, input_path: str, output_path: str):
-        probe = ffmpeg.probe(input_path)
-        video_info = next(
-            (stream for stream in probe["streams"] if stream["codec_type"] == "video"),
-            None,
-        )
+        video_info = get_video_info(input_path)
         width = video_info["width"]
         height = video_info["height"]
 
@@ -854,13 +833,7 @@ class VideoTrimTool(Tool):
     ):
         stream = ffmpeg.input(input_path)
         v = stream.trim(start=start_time, end=end_time).setpts("PTS-STARTPTS")
-        probe = ffmpeg.probe(input_path)
-        audio_stream = False
-        for in_stream in probe["streams"]:
-            if in_stream["codec_type"] == "audio":
-                audio_stream = True
-
-        if audio_stream:
+        if has_audio(input_path):
             a = stream.filter_("atrim", start=start_time, end=end_time).filter_(
                 "asetpts", "PTS-STARTPTS"
             )
