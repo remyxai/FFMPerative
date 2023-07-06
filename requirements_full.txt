@@ -2,4 +2,3 @@ demucs
 onnx
 onnxruntime
 scenedetect
--e git+https://github.com/m-bain/whisperx.git

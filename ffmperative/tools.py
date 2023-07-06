@@ -1,15 +1,12 @@
-import re
 import math
 import json
 import ffmpeg
-import subprocess
 from PIL import Image
 from io import BytesIO
 from pathlib import Path
-from collections import Counter
 from transformers import Tool
 
-from .utils import modify_file_name, probe_video, get_video_info, has_audio
+from .utils import get_video_info, has_audio
 
 
 class AudioAdjustmentTool(Tool):

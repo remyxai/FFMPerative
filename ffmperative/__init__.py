@@ -1,5 +1,3 @@
-import os
-import sys
 from .tools import *
 
 try:
@@ -8,6 +6,7 @@ try:
     _extras = True
 except ImportError:
     _extras = False
+
 from transformers.tools import HfAgent
 
 

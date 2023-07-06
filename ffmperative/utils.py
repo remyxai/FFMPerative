@@ -1,5 +1,4 @@
 import os
-import json
 import ffmpeg
 
 from pathlib import Path

@@ -28,7 +28,7 @@ FFMPerative is your copilot for video production workflows. Powered by Large Lan
 
 ### Debian Package (recommended)
 For debian, build and install the package:
-```
+```bash
 dpkg-deb --build package_build/ ffmperative.deb
 sudo dpkg -i ffmperative.deb
 ```
@@ -66,19 +66,19 @@ FFMPerative excels in task compositition. For instance, [curate video highlights
 ### Windows & Mac Setup
 #### Get the Docker Image
 Pull an image from DockerHub:
-```
+```bash
 docker pull smellslikeml/ffmperative:latest
 ```
 
 Or clone this repo and build an image with the `Dockerfile`:
-```
+```bash
 git clone https://github.com/remyxai/FFMPerative.git
 cd FFMPerative
 docker build -t ffmperative .
 ```
 
 #### Run FFMPerative in a Container
-```
+```bash
 docker run -it -e HUGGINGFACE_TOKEN='YOUR_HF_TOKEN' -v /path/to/dir:/path/to/dir --entrypoint /bin/bash ffmperative:latest
 ```
 
@@ -110,7 +110,7 @@ ffmp("sample the 5th frame from '/path/to/video.mp4'")
 ```
 
 You can also use the cli with:
-```
+```bash
 ffmp do --p "sample the 5th frame from '/path/to/video.mp4'"
 ```
 
