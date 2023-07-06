@@ -354,16 +354,24 @@ class VideoCaptionTool(Tool):
     This tool subtitles/captions a video with a text overlay from a .srt subtitle file. 
     Inputs are input_path, output_path, srt_path.
     """
-    inputs = ["text", "text", "text"]
+    inputs = ["text", "text", "text", "text"]
     outputs = ["None"]
 
-    def __call__(self, input_path: str, output_path: str, srt_path: str):
+    def __call__(
+        self,
+        input_path: str,
+        output_path: str,
+        srt_path: str,
+        subtitle_style: str = None,
+    ):
         if input_path == output_path:
-            # Slightly change path to avoid overwriting input file
             output_path = modify_file_name(output_path, "cap_")
+        subtitle_arg = f"subtitles={srt_path}"
+        if subtitle_style:
+            subtitle_arg += f":force_style='{subtitle_style}'"
         (
             ffmpeg.input(input_path)
-            .output(output_path, vf="subtitles={}".format(srt_path))
+            .output(output_path, vf=subtitle_arg)
             .overwrite_output()
             .run()
         )
