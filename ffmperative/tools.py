@@ -1,3 +1,4 @@
+import os
 import re
 import json
 import ffmpeg
@@ -12,6 +13,11 @@ from .utils import modify_file_name
 import whisperx
 import demucs.separate
 from scenedetect import detect, ContentDetector, split_video_ffmpeg
+
+import numpy as np
+import onnxruntime as rt
+import csv
+import cv2
 
 
 class AudioAdjustmentTool(Tool):
@@ -402,6 +408,63 @@ class VideoFlipTool(Tool):
         stream = ffmpeg.output(stream, output_path)
         ffmpeg.run(stream)
         return output_path
+
+class VideoFrameClassifierTool(Tool):
+    name = "video_frame_classifier_tool"
+    description = """
+    This tool classifies frames from video input using a given ONNX model.
+    Inputs are input_path, model_path, and n (infer every nth frame, skip n frames).
+    """
+    inputs = ["text", "text", "integer"]
+    outputs = ["None"]
+
+    def get_video_size(self, filename):
+        probe = ffmpeg.probe(filename)
+        video_info = next(s for s in probe['streams'] if s['codec_type'] == 'video')
+        width = int(video_info['width'])
+        height = int(video_info['height'])
+        return width, height
+
+    def get_metadata_from_csv(self, metadata_path):
+        with open(metadata_path, 'r') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                labels = row['labels'].split("|")
+                input_shape = eval(row['input_shape'])
+                return labels, input_shape
+
+    def classify_frame(self, frame):
+        input_name = self.onnx_session.get_inputs()[0].name
+        raw_result = self.onnx_session.run(None, {input_name: frame})
+        result_indices = np.argmax(raw_result[0], axis=1)
+        results = np.take(self.labels, result_indices, axis=0)
+        return str(results[0])
+
+    def __call__(self, input_path: str, model_path: str, n: int = 5):
+        self.onnx_session = rt.InferenceSession(model_path)
+        self.labels, self.input_shape = self.get_metadata_from_csv(os.path.join(os.path.dirname(model_path), 'metadata.csv'))
+        width, height = self.get_video_size(input_path)
+        out, _ = (
+            ffmpeg.input(input_path)
+            .output('pipe:', format='rawvideo', pix_fmt='rgb24')
+            .run(capture_stdout=True, capture_stderr=True)
+        )
+        video = (
+            np.frombuffer(out, np.uint8)
+            .reshape([-1, height, width, 3])
+        )
+        results = {}
+        for i in range(0, len(video), n):
+            frame = video[i].astype('float32') / 255.0
+            frame = frame * 2 - 1
+            frame_resized = cv2.resize(frame, self.input_shape[1:3])  # Adjust according to your model's input size
+            frame_ready = np.expand_dims(frame_resized, axis=0)
+            results[i] = self.classify_frame(frame_ready)
+        
+        # Save results to json file
+        json_output_path = os.path.splitext(input_path)[0] + '.json'
+        with open(json_output_path, 'w') as json_file:
+            json.dump(results, json_file)
 
 
 class VideoFrameSampleTool(Tool):
