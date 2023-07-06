@@ -5,16 +5,19 @@
 
 ## Video Production at the Speed of Chat
 
-We use Large Language Models (LLMs) with Tools to tackle tough tasks put in simple terms. Consider FFMPerative your copilot for video production workflows like:
+FFMPerative is your copilot for video production workflows. Powered by Large Language Models (LLMs) and an intuitive chat interface, it makes complex tasks as simple as typing a sentence. Leverage the power of FFmpeg and cutting-edge machine learning tools without dealing with complex command-line arguments or scripts.
 
 * Get Video Metadata
 * Sample Image from Video
 * Change Video Playback Speed
-* Make a Video from a Directory of Images 
+* Apply FFmpeg xfade transition filters
 * Resize, Crop, Flip, Reverse Video/GIF
+* Make a Video from a Directory of Images 
+* Overlay Image & Video for Picture-in-Picture
 * Adjust Audio Levels, Background Noise Removal
-* Overlay Video for Picture-in-Picture
-* Split Video with Scene Detection
+* Speech-to-Text Transcription and Closed-Captions
+* Split Video by N-second Gops or with Scene Detection
+* Image Classifier Inference on every N-th Video Frame
 
 ## Setup 
 
@@ -49,7 +52,7 @@ Try adding closed-captions with:
 ffmperative "merge subtitles '/path/to/captions.srt' with video '/path/to/my_video.mp4' calling it '/path/to/my_video_captioned.mp4'"
 ```
 
-FFMPerative shines in task compositition, you can [curate video highlights](https://blog.remyx.ai/posts/data-processing-agents/) by analyzing speech transcripts:
+FFMPerative excels in task compositition. For instance, [curate video highlights](https://blog.remyx.ai/posts/data-processing-agents/) by analyzing speech transcripts:
 
 ![smart_trim](https://blog.remyx.ai/img/ffmperative-auto-edit-pipeline.png#center)
 
@@ -77,7 +80,9 @@ docker run -it -e HUGGINGFACE_TOKEN='YOUR_HF_TOKEN' -v /path/to/dir:/path/to/dir
 ## Features
 
 ### Python Usage
-Import the library and pass your prompt to `ffmp`.
+
+You can also use FFMPerative in your Python projects. Simply import the library and pass your command as a string to `ffmp`.
+
 ```python
 from ffmperative import ffmp
 
@@ -85,6 +90,8 @@ ffmp("sample the 5th frame from '/path/to/video.mp4'")
 ```
 
 ### Notebooks
+
+Explore our notebooks for practical applications of FFMPerative:
 
 * [Automatically Edit Videos from Google Drive in Colab](https://colab.research.google.com/drive/149byzCNd17dAehVuWXkiFQ2mVe_icLCa?usp=sharing)
 
@@ -100,7 +107,8 @@ ffmp("sample the 5th frame from '/path/to/video.mp4'")
 
 ### Contributing
 
-* Have a video processing workflow in mind? Raise an issue and we'll try helping to design it!
+* Have a video processing workflow in mind? Want to contribute to our project? We'd love to hear from you! Raise an issue and we'll work together to design it.
+
 
 ### Resources
 * [Huggingface Transformers Agents](https://huggingface.co/docs/transformers/transformers_agents)
