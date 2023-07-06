@@ -49,7 +49,7 @@ Try adding closed-captions with:
 ffmperative "merge subtitles '/path/to/captions.srt' with video '/path/to/my_video.mp4' calling it '/path/to/my_video_captioned.mp4'"
 ```
 
-With more compositition, you can even curate highlights from long-form video by analyzing speech transcripts [with LLMs](https://blog.remyx.ai/posts/data-processing-agents/):
+With more compositition, you can even [curate highlights from long-form video](https://blog.remyx.ai/posts/data-processing-agents/) by analyzing speech transcripts:
 
 ![smart_trim](https://blog.remyx.ai/img/ffmperative-auto-edit-pipeline.png#center)
 
