@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Load the configuration file
+source /etc/ffmperative/config
+
+# Check if the necessary environment variables are set
+if [[ -z "$HUGGINGFACE_TOKEN" || -z "$VIDEOS_PATH" ]]; then
+    echo "Error: HUGGINGFACE_TOKEN and VIDEOS_PATH must be set in /etc/ffmperative/config"
+    exit 1
+fi
+
+# Run the Docker command
+/usr/bin/docker run -e HUGGINGFACE_TOKEN=$HUGGINGFACE_TOKEN -v ${VIDEOS_PATH}:/app ffmperative:latest "$1"

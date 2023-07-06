@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Check if the configuration file already exists
+if [ ! -f /etc/ffmperative/config ]; then
+    # If not, create the configuration file
+    echo "HUGGINGFACE_TOKEN=" > /etc/ffmperative/config
+    echo "VIDEOS_PATH=" >> /etc/ffmperative/config
+    echo "Please add your Hugging Face token and your Videos directory path to the configuration file at /etc/ffmperative/config."
+fi
+
+# Build the Docker image
+docker build -t ffmperative:latest /usr/share/ffmperative/
