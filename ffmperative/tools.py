@@ -1,7 +1,10 @@
 import os
 import re
+import csv
+import cv2
 import json
 import ffmpeg
+import numpy as np
 import subprocess
 from io import BytesIO
 from PIL import Image
@@ -13,11 +16,8 @@ from .utils import modify_file_name
 import whisperx
 import demucs.separate
 from scenedetect import detect, ContentDetector, split_video_ffmpeg
-
-import numpy as np
 import onnxruntime as rt
-import csv
-import cv2
+
 
 
 class AudioAdjustmentTool(Tool):
