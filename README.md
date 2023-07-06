@@ -5,7 +5,7 @@
 
 ## Video Production at the Speed of Chat
 
-Large Language Models (LLMs) with Tools can tackle tough tasks framed in simple language. Consider FFMPerative your copilot for common video processing workflows such as:
+We use Large Language Models (LLMs) with Tools to tackle tough tasks put in simple terms. Consider FFMPerative your copilot for video production workflows like:
 
 * Get Video Metadata
 * Sample Image from Video
