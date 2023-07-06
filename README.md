@@ -18,6 +18,20 @@ Large Language Models (LLMs) with Tools can perform complex tasks from natural l
 
 ## Setup 
 
+### Installation
+For Linux users, simply install via aptitude:
+```
+dpkg-deb --build package_build/ ffmperative.deb
+sudo dpkg -i ffmperative.deb
+```
+Then run the following line to configure the package to mount the directory at `/home/$(hostname)/Videos/`:
+```
+echo -e "HUGGINGFACE_TOKEN=$HUGGINGFACE_TOKEN\nVIDEOS_PATH=/home/$(hostname)/Videos" | sudo tee /etc/ffmperative/config
+```
+
+
+
+### Windows & Mac
 #### Get the Docker Image
 Pull an image from DockerHub:
 ```
@@ -31,31 +45,30 @@ cd FFMPerative
 docker build -t ffmp .
 ```
 
-### Run FFMPerative in a Container
+#### Run FFMPerative in a Container
 ```
-docker run -it -e HUGGINGFACE_TOKEN='YOUR_HF_TOKEN' -v /path/to/dir:/path/to/dir ffmp:latest "YOUR PROMPT"
+docker run -it -e HUGGINGFACE_TOKEN='YOUR_HF_TOKEN' -v /path/to/dir:/path/to/dir --entrypoint /bin/bash ffmp:latest
 ```
 
 ## Quickstart
 
-Editing video with FFMPerative is simple, import the library and declare what you want done.
+Editing video with FFMPerative is simple.
 
-```python
-from ffmperative import ffmp
-
-ffmp("sample the 5th frame from '/path/to/video.mp4'")
+Run FFMPerative from the command-line:
+```bash
+ffmperative "sample the 5th frame from /path/to/video.mp4"
 ```
 
 As above, you can sample a frame from a video clip. You can also split a long video into short clips via scene detection:
 
-```python
-ffmp("split the video '/path/to/my_video.mp4' by scene")
+```bash
+ffmperative "split the video '/path/to/my_video.mp4' by scene"
 ```
 
 Another common workflow, adding closed-captioning:
 
-```python
-ffmp("merge subtitles '/path/to/captions.srt' with video '/path/to/my_video.mp4' calling it '/path/to/my_video_captioned.mp4'")
+```bash
+ffmperative "merge subtitles '/path/to/captions.srt' with video '/path/to/my_video.mp4' calling it '/path/to/my_video_captioned.mp4'"
 ```
 
 By compositition, you can even curate highlights from long-form video by analyzing speech transcripts [with LLMs](https://blog.remyx.ai/posts/data-processing-agents/):
@@ -64,10 +77,12 @@ By compositition, you can even curate highlights from long-form video by analyzi
 
 ## Features
 
-### CLI
-Run FFMPerative from the command-line:
-```bash
-ffmp do --p "sample the 5th frame from /path/to/video.mp4"
+### Python Bindings
+Import the library and pass your prompt as argument to `ffmp`.
+```python
+from ffmperative import ffmp
+
+ffmp("sample the 5th frame from '/path/to/video.mp4'")
 ```
 
 ### Notebooks
@@ -80,6 +95,7 @@ ffmp do --p "sample the 5th frame from /path/to/video.mp4"
 - [x] Release to PyPI after Agents are Added to Transformers
 - [x] Add ML-enabled Tools: [demucs](https://github.com/facebookresearch/demucs), [PySceneDetect](https://github.com/Breakthrough/PySceneDetect) 
 - [x] Docker Image with Latest FFmpeg
+- [ ] Host .deb package for `apt-get` installation
 - [ ] Release LLM checkpoint fine-tuned to use ffmp Tools
 
 
