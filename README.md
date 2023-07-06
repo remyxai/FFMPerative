@@ -18,13 +18,13 @@ Large Language Models (LLMs) with Tools can perform complex tasks from natural l
 
 ## Setup 
 
-### Debian Installation
-For debian users, build the package:
+### Debian Package
+For debian, build and install the package:
 ```
 dpkg-deb --build package_build/ ffmperative.deb
 sudo dpkg -i ffmperative.deb
 ```
-Run the following to configure the package to mount the directory at `/home/$(hostname)/Videos/`:
+Configure the package to mount the directory at `/home/$(hostname)/Videos/` by running:
 ```
 echo -e "HUGGINGFACE_TOKEN=$HUGGINGFACE_TOKEN\nVIDEOS_PATH=/home/$(hostname)/Videos" | sudo tee /etc/ffmperative/config
 ```
@@ -75,8 +75,8 @@ docker run -it -e HUGGINGFACE_TOKEN='YOUR_HF_TOKEN' -v /path/to/dir:/path/to/dir
 
 ## Features
 
-### Python Bindings
-Import the library and pass your prompt as argument to `ffmp`.
+### Python Usage
+Import the library and pass your prompt to `ffmp`.
 ```python
 from ffmperative import ffmp
 
