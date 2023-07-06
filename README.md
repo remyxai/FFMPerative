@@ -18,36 +18,15 @@ Large Language Models (LLMs) with Tools can perform complex tasks from natural l
 
 ## Setup 
 
-### Installation
-For Linux users, simply install via aptitude:
+### Debian Installation
+For debian users, build the package:
 ```
 dpkg-deb --build package_build/ ffmperative.deb
 sudo dpkg -i ffmperative.deb
 ```
-Then run the following line to configure the package to mount the directory at `/home/$(hostname)/Videos/`:
+Run the following to configure the package to mount the directory at `/home/$(hostname)/Videos/`:
 ```
 echo -e "HUGGINGFACE_TOKEN=$HUGGINGFACE_TOKEN\nVIDEOS_PATH=/home/$(hostname)/Videos" | sudo tee /etc/ffmperative/config
-```
-
-
-
-### Windows & Mac
-#### Get the Docker Image
-Pull an image from DockerHub:
-```
-docker pull smellslikeml/ffmp:latest
-```
-
-Or clone this repo and build an image with the `Dockerfile`:
-```
-git clone https://github.com/remyxai/FFMPerative.git
-cd FFMPerative
-docker build -t ffmp .
-```
-
-#### Run FFMPerative in a Container
-```
-docker run -it -e HUGGINGFACE_TOKEN='YOUR_HF_TOKEN' -v /path/to/dir:/path/to/dir --entrypoint /bin/bash ffmp:latest
 ```
 
 ## Quickstart
@@ -74,6 +53,27 @@ ffmperative "merge subtitles '/path/to/captions.srt' with video '/path/to/my_vid
 By compositition, you can even curate highlights from long-form video by analyzing speech transcripts [with LLMs](https://blog.remyx.ai/posts/data-processing-agents/):
 
 ![smart_trim](https://blog.remyx.ai/img/ffmperative-auto-edit-pipeline.png#center)
+
+
+### Windows & Mac Setup
+#### Get the Docker Image
+Pull an image from DockerHub:
+```
+docker pull smellslikeml/ffmp:latest
+```
+
+Or clone this repo and build an image with the `Dockerfile`:
+```
+git clone https://github.com/remyxai/FFMPerative.git
+cd FFMPerative
+docker build -t ffmp .
+```
+
+#### Run FFMPerative in a Container
+```
+docker run -it -e HUGGINGFACE_TOKEN='YOUR_HF_TOKEN' -v /path/to/dir:/path/to/dir --entrypoint /bin/bash ffmp:latest
+```
+
 
 ## Features
 
