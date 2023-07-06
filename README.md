@@ -65,19 +65,19 @@ FFMPerative excels in task compositition. For instance, [curate video highlights
 #### Get the Docker Image
 Pull an image from DockerHub:
 ```
-docker pull smellslikeml/ffmp:latest
+docker pull smellslikeml/ffmperative:latest
 ```
 
 Or clone this repo and build an image with the `Dockerfile`:
 ```
 git clone https://github.com/remyxai/FFMPerative.git
 cd FFMPerative
-docker build -t ffmp .
+docker build -t ffmperative .
 ```
 
 #### Run FFMPerative in a Container
 ```
-docker run -it -e HUGGINGFACE_TOKEN='YOUR_HF_TOKEN' -v /path/to/dir:/path/to/dir --entrypoint /bin/bash ffmp:latest
+docker run -it -e HUGGINGFACE_TOKEN='YOUR_HF_TOKEN' -v /path/to/dir:/path/to/dir --entrypoint /bin/bash ffmperative:latest
 ```
 
 
@@ -106,7 +106,7 @@ Explore our notebooks for practical applications of FFMPerative:
 - [x] Add ML-enabled Tools: [demucs](https://github.com/facebookresearch/demucs), [PySceneDetect](https://github.com/Breakthrough/PySceneDetect) 
 - [x] Docker Image with Latest FFmpeg
 - [ ] Host .deb package for `apt-get` installation
-- [ ] Release LLM checkpoint fine-tuned to use ffmp Tools
+- [ ] Release LLM checkpoint fine-tuned to use FFMPerative Tools
 
 
 ### Contributing
