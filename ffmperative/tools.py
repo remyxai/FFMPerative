@@ -811,6 +811,9 @@ class VideoTransitionTool(Tool):
     description = """
     This tool applies a xfade filter transitions between two videos.
     Inputs are input_path1, input_path2, output_path, transition_type, duration, and offset.
+    transition_type: fade, fadeblack, fadewhite, slideleft, slideright, slideup, slidedown,
+    circlecrop, circleclose, circleopen, vertopen, horzopen, vertclose, horzclose, radial,
+    coverleft, coverright, coverup, coverdown, squeezeev, squeezeeh, zoomin.
     """
     inputs = ["text", "text", "text", "text", "float", "float"]
     outputs = ["None"]
