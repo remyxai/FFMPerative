@@ -156,7 +156,7 @@ class ImageDirectoryToVideoTool(Tool):
 class ImageZoomPanTool(Tool):
     name = "image_zoompan_tool"
     description = """
-    This tool applies the Ken Burns effect with zoompan filter on image for video.
+    This tool creates a video by applying the zoompan filter for a Ken Burns effect on image.
     Inputs are input_path, output_path, zoom_factor.
     """
     inputs = ["text", "text", "integer"]
@@ -561,26 +561,25 @@ class VideoLetterBoxingTool(Tool):
     name = "video_letterboxing_tool"
     description = """
     This tool adds letterboxing to a video.
-    Inputs are input_path, output_path.
+    Inputs are input_path, output_path, width, height, bg_color.
     """
-    inputs = ["text", "text"]
+    inputs = ["text", "text", "int", "int", "text"]
     outputs = ["None"]
 
-    def __call__(self, input_path: str, output_path: str):
+    def __call__(
+        self, input_path: str, output_path: str, width: int = 1920, height: int = 1080, bg_color: str = 'black'):
         video_info = get_video_info(input_path)
-        width = video_info["width"]
-        height = video_info["height"]
+        old_width = int(video_info["width"])
+        old_height = int(video_info["height"])
 
         # Check if the video is in portrait mode
-        if height >= width:
-            (
-                ffmpeg.input(input_path)
-                .output(
-                    output_path,
-                    vf="scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:-1:-1:color=black",
-                )
-                .run()
+        if old_height >= old_width:
+            vf_option = "scale={}:{}:force_original_aspect_ratio=decrease,pad={}:{}:-1:-1:color={}".format(
+                width, height, width, height, bg_color
             )
+        else:
+            vf_option = "scale={}:-1".format(width)
+        (ffmpeg.input(input_path).output(output_path, vf=vf_option).run())
 
 
 class VideoOverlayTool(Tool):
