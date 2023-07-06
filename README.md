@@ -31,20 +31,18 @@ echo -e "HUGGINGFACE_TOKEN=$HUGGINGFACE_TOKEN\nVIDEOS_PATH=/home/$(hostname)/Vid
 
 ## Quickstart
 
-Editing video with FFMPerative is simple.
-
-Run FFMPerative from the command-line:
+To sample an image from a video clip, simply run FFMPerative from the command-line:
 ```bash
 ffmperative "sample the 5th frame from /path/to/video.mp4"
 ```
 
-As above, you can sample a frame from a video clip. You can also split a long video into short clips via scene detection:
+Or split a long video into short clips via scene detection:
 
 ```bash
 ffmperative "split the video '/path/to/my_video.mp4' by scene"
 ```
 
-Another common workflow, adding closed-captioning:
+You can add closed-captioning with:
 
 ```bash
 ffmperative "merge subtitles '/path/to/captions.srt' with video '/path/to/my_video.mp4' calling it '/path/to/my_video_captioned.mp4'"
