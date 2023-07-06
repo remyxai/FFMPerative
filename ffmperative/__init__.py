@@ -32,6 +32,7 @@ def ffmp(
         VideoFlipTool(),
         VideoFrameClassifierTool(),
         VideoFrameSampleTool(),
+        VideoGopChunkerTool(),
         VideoHTTPServerTool(),
         VideoLetterBoxingTool(),
         VideoOverlayTool(),

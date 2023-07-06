@@ -2,12 +2,14 @@ import os
 import re
 import csv
 import cv2
+import math
 import json
 import ffmpeg
 import numpy as np
 import subprocess
 from io import BytesIO
 from PIL import Image
+from pathlib import Path
 from collections import Counter
 from transformers import Tool
 
@@ -17,7 +19,6 @@ import whisperx
 import demucs.separate
 from scenedetect import detect, ContentDetector, split_video_ffmpeg
 import onnxruntime as rt
-
 
 
 class AudioAdjustmentTool(Tool):
@@ -190,11 +191,17 @@ class SpeechToSubtitleTool(Tool):
     inputs = ["text", "text", "boolean"]
     outputs = ["None"]
 
-    def __init__(self, language="en", device="cpu", model_name="small", compute_type="int8"):
+    def __init__(
+        self, language="en", device="cpu", model_name="small", compute_type="int8"
+    ):
         self.device = device
         self.compute_type = compute_type
-        self.model = whisperx.load_model(model_name, self.device, compute_type=self.compute_type)
-        self.model_a, self.metadata = whisperx.load_align_model(language_code=language, device=self.device)
+        self.model = whisperx.load_model(
+            model_name, self.device, compute_type=self.compute_type
+        )
+        self.model_a, self.metadata = whisperx.load_align_model(
+            language_code=language, device=self.device
+        )
 
     def convert_to_srt_time(self, time: float) -> str:
         hh, rem = divmod(time, 3600)
@@ -205,8 +212,15 @@ class SpeechToSubtitleTool(Tool):
     def create_srt_content(self, result: dict) -> str:
         srt_content = []
         for idx, js in enumerate(result["segments"]):
-            start_time, end_time = self.convert_to_srt_time(js["start"]), self.convert_to_srt_time(js["end"])
-            srt_content.append("{}\n{} --> {}\n{}\n\n".format(idx + 1, start_time, end_time, js["text"]))
+            start_time, end_time = (
+                self.convert_to_srt_time(js["start"]),
+                self.convert_to_srt_time(js["end"]),
+            )
+            srt_content.append(
+                "{}\n{} --> {}\n{}\n\n".format(
+                    idx + 1, start_time, end_time, js["text"]
+                )
+            )
         return "".join(srt_content)
 
     def write_to_srt(self, srt_path: str, srt_content: str):
@@ -230,45 +244,52 @@ class SpeechToSubtitleTool(Tool):
 
     def generate_srt(self, input_path: str, srt_path: str, batch_size: int = 16):
         transcribed_result = self.transcribe_audio(input_path, batch_size)
-        aligned_result = self.align_audio(transcribed_result["segments"], audio=whisperx.load_audio(input_path))
+        aligned_result = self.align_audio(
+            transcribed_result["segments"], audio=whisperx.load_audio(input_path)
+        )
         srt_content = self.create_srt_content(aligned_result)
         self.write_to_srt(srt_path, srt_content)
 
-    def __call__(self, input_path, output_path, highlight_words: bool = True, batch_size: int = 16):
+    def __call__(
+        self,
+        input_path,
+        output_path,
+        highlight_words: bool = True,
+        batch_size: int = 16,
+    ):
         if not highlight_words:
             self.generate_srt(input_path, output_path)
         else:
-                audio = whisperx.load_audio(input_path)
-                result = self.model.transcribe(audio, batch_size=batch_size)
-                result = whisperx.align(
-                    result["segments"],
-                    self.model_a,
-                    self.metadata,
-                    audio,
-                    self.device,
-                    return_char_alignments=False,
-                )
+            audio = whisperx.load_audio(input_path)
+            result = self.model.transcribe(audio, batch_size=batch_size)
+            result = whisperx.align(
+                result["segments"],
+                self.model_a,
+                self.metadata,
+                audio,
+                self.device,
+                return_char_alignments=False,
+            )
 
-                with open(output_path, "w") as outfile:
-                    for idx, segment in enumerate(result["segments"]):
-                        start_time_srt = self.convert_to_srt_time(segment["start"])
-                        end_time_srt = self.convert_to_srt_time(segment["end"])
+            with open(output_path, "w") as outfile:
+                for idx, segment in enumerate(result["segments"]):
+                    start_time_srt = self.convert_to_srt_time(segment["start"])
+                    end_time_srt = self.convert_to_srt_time(segment["end"])
 
-                        words = []
-                        for word_timing in segment["words"]:
-                            words.append(word_timing["word"])
+                    words = []
+                    for word_timing in segment["words"]:
+                        words.append(word_timing["word"])
 
-                        for i, word in enumerate(words):
-                            highlighted_text = ' '.join(['<u>'+word+'</u>' if word == w else w for w in words])
+                    for i, word in enumerate(words):
+                        highlighted_text = " ".join(
+                            ["<u>" + word + "</u>" if word == w else w for w in words]
+                        )
 
-                            outfile.write(
-                                "{}\n{} --> {}\n{}\n\n".format(
-                                    idx + 1,
-                                    start_time_srt,
-                                    end_time_srt,
-                                    highlighted_text,
-                                )
+                        outfile.write(
+                            "{}\n{} --> {}\n{}\n\n".format(
+                                idx + 1, start_time_srt, end_time_srt, highlighted_text
                             )
+                        )
 
 
 class VideoAutoCropTool(Tool):
@@ -409,6 +430,7 @@ class VideoFlipTool(Tool):
         ffmpeg.run(stream)
         return output_path
 
+
 class VideoFrameClassifierTool(Tool):
     name = "video_frame_classifier_tool"
     description = """
@@ -420,17 +442,17 @@ class VideoFrameClassifierTool(Tool):
 
     def get_video_size(self, filename):
         probe = ffmpeg.probe(filename)
-        video_info = next(s for s in probe['streams'] if s['codec_type'] == 'video')
-        width = int(video_info['width'])
-        height = int(video_info['height'])
+        video_info = next(s for s in probe["streams"] if s["codec_type"] == "video")
+        width = int(video_info["width"])
+        height = int(video_info["height"])
         return width, height
 
     def get_metadata_from_csv(self, metadata_path):
-        with open(metadata_path, 'r') as f:
+        with open(metadata_path, "r") as f:
             reader = csv.DictReader(f)
             for row in reader:
-                labels = row['labels'].split("|")
-                input_shape = eval(row['input_shape'])
+                labels = row["labels"].split("|")
+                input_shape = eval(row["input_shape"])
                 return labels, input_shape
 
     def classify_frame(self, frame):
@@ -442,28 +464,29 @@ class VideoFrameClassifierTool(Tool):
 
     def __call__(self, input_path: str, model_path: str, n: int = 5):
         self.onnx_session = rt.InferenceSession(model_path)
-        self.labels, self.input_shape = self.get_metadata_from_csv(os.path.join(os.path.dirname(model_path), 'metadata.csv'))
+        self.labels, self.input_shape = self.get_metadata_from_csv(
+            os.path.join(os.path.dirname(model_path), "metadata.csv")
+        )
         width, height = self.get_video_size(input_path)
         out, _ = (
             ffmpeg.input(input_path)
-            .output('pipe:', format='rawvideo', pix_fmt='rgb24')
+            .output("pipe:", format="rawvideo", pix_fmt="rgb24")
             .run(capture_stdout=True, capture_stderr=True)
         )
-        video = (
-            np.frombuffer(out, np.uint8)
-            .reshape([-1, height, width, 3])
-        )
+        video = np.frombuffer(out, np.uint8).reshape([-1, height, width, 3])
         results = {}
         for i in range(0, len(video), n):
-            frame = video[i].astype('float32') / 255.0
+            frame = video[i].astype("float32") / 255.0
             frame = frame * 2 - 1
-            frame_resized = cv2.resize(frame, self.input_shape[1:3])  # Adjust according to your model's input size
+            frame_resized = cv2.resize(
+                frame, self.input_shape[1:3]
+            )  # Adjust according to your model's input size
             frame_ready = np.expand_dims(frame_resized, axis=0)
             results[i] = self.classify_frame(frame_ready)
-        
+
         # Save results to json file
-        json_output_path = os.path.splitext(input_path)[0] + '.json'
-        with open(json_output_path, 'w') as json_file:
+        json_output_path = os.path.splitext(input_path)[0] + ".json"
+        with open(json_output_path, "w") as json_file:
             json.dump(results, json_file)
 
 
@@ -487,6 +510,36 @@ class VideoFrameSampleTool(Tool):
         img = Image.open(BytesIO(out))
         img.save(output_path)
         return output_path
+
+
+class VideoGopChunkerTool(Tool):
+    name = "video_chunker_tool"
+    description = """
+    This tool segments video input into GOPs (Group of Pictures) chunks of 
+    segment_length (in seconds). Inputs are input_path and segment_length.
+    """
+    inputs = ["text", "integer"]
+    outputs = ["None"]
+
+    def __init__(self):
+        super().__init__()
+
+    def __call__(self, input_path, segment_length):
+        basename = Path(input_path).stem
+        output_dir = Path(input_path).parent
+        probe = ffmpeg.probe(input_path)
+        duration = float(probe["format"]["duration"])
+        num_segments = math.ceil(duration / segment_length)
+        num_digits = len(str(num_segments))
+        filename_pattern = f"{output_dir}/{basename}_%0{num_digits}d.mp4"
+
+        ffmpeg.input(input_path).output(
+            filename_pattern,
+            c="copy",
+            map="0",
+            f="segment",
+            segment_time=segment_length,
+        ).run()
 
 
 class VideoHTTPServerTool(Tool):
