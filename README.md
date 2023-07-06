@@ -5,7 +5,7 @@
 
 ## Video Production at the Speed of Chat
 
-Large Language Models (LLMs) with Tools can perform complex tasks from natural language prompts. Using HuggingFace's Agents & Tools, FFMPerative is specialized to common video processing workflows like:
+Large Language Models (LLMs) with Tools can tackle tough tasks framed in simple language. Consider FFMPerative your copilot for common video processing workflows such as:
 
 * Get Video Metadata
 * Sample Image from Video
@@ -32,23 +32,24 @@ echo -e "HUGGINGFACE_TOKEN=$HUGGINGFACE_TOKEN\nVIDEOS_PATH=/home/$(hostname)/Vid
 ## Quickstart
 
 To sample an image from a video clip, simply run FFMPerative from the command-line:
+
 ```bash
 ffmperative "sample the 5th frame from /path/to/video.mp4"
 ```
 
-Or split a long video into short clips via scene detection:
+Similarly, it's simple to split a long video into short clips via scene detection:
 
 ```bash
 ffmperative "split the video '/path/to/my_video.mp4' by scene"
 ```
 
-You can add closed-captioning with:
+Try adding closed-captions with:
 
 ```bash
 ffmperative "merge subtitles '/path/to/captions.srt' with video '/path/to/my_video.mp4' calling it '/path/to/my_video_captioned.mp4'"
 ```
 
-By compositition, you can even curate highlights from long-form video by analyzing speech transcripts [with LLMs](https://blog.remyx.ai/posts/data-processing-agents/):
+With more compositition, you can even curate highlights from long-form video by analyzing speech transcripts [with LLMs](https://blog.remyx.ai/posts/data-processing-agents/):
 
 ![smart_trim](https://blog.remyx.ai/img/ffmperative-auto-edit-pipeline.png#center)
 
