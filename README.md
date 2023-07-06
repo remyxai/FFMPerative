@@ -8,7 +8,6 @@
 </p>
 
 ## Video Production at the Speed of Chat
-
 FFMPerative is your copilot for video production workflows. Powered by Large Language Models (LLMs) and an intuitive chat interface, it makes complex tasks as simple as typing a sentence. Leverage the power of FFmpeg and cutting-edge machine learning tools without dealing with complex command-line arguments or scripts.
 
 * Get Video Metadata
@@ -25,8 +24,7 @@ FFMPerative is your copilot for video production workflows. Powered by Large Lan
 
 ## Setup 
 
-
-### Debian Package (recommended)
+### Debian Package (Recommended)
 For debian, build and install the package:
 ```bash
 dpkg-deb --build package_build/ ffmperative.deb
@@ -37,9 +35,9 @@ Configure the package to mount the directory at `/home/$(hostname)/Videos/` by r
 echo -e "HUGGINGFACE_TOKEN=$HUGGINGFACE_TOKEN\nVIDEOS_PATH=/home/$(hostname)/Videos" | sudo tee /etc/ffmperative/config
 ```
 
+For Windows & Mac, see [Docker Setup](docker/README.md).
 
 ## Quickstart
-
 To sample an image from a video clip, simply run FFMPerative from the command-line:
 
 ```bash
@@ -62,34 +60,14 @@ FFMPerative excels in task compositition. For instance, [curate video highlights
 
 ![smart_trim](https://blog.remyx.ai/img/ffmperative-auto-edit-pipeline.png#center)
 
-
-### Windows & Mac Setup
-#### Get the Docker Image
-Pull an image from DockerHub:
-```bash
-docker pull smellslikeml/ffmperative:latest
-```
-
-Or clone this repo and build an image with the `Dockerfile`:
-```bash
-git clone https://github.com/remyxai/FFMPerative.git
-cd FFMPerative
-docker build -t ffmperative .
-```
-
-#### Run FFMPerative in a Container
-```bash
-docker run -it -e HUGGINGFACE_TOKEN='YOUR_HF_TOKEN' -v /path/to/dir:/path/to/dir --entrypoint /bin/bash ffmperative:latest
-```
-
-
 ## Features
 
 ### Python Usage
-It's not required to install FFMPerative as a Debian package. If `ffmpeg` is already available on your system, you can simply install FFMPerative through pip.
+With `ffmpeg` is available on your system, you can make a lightweight installation of FFMPerative through pip.
 
-#### Base Installation
-You can install the base version of ffmperative with:
+#### Setup
+Make the minimal install of ffmperative with:
+
 ```bash
 # from PyPI
 pip install ffmperative
@@ -109,7 +87,7 @@ from ffmperative import ffmp
 ffmp("sample the 5th frame from '/path/to/video.mp4'")
 ```
 
-You can also use the cli with:
+You can also use the command-line interface:
 ```bash
 ffmp do --p "sample the 5th frame from '/path/to/video.mp4'"
 ```
