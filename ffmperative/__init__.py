@@ -1,6 +1,13 @@
 import os
 import sys
 from .tools import *
+
+try:
+    from .extras import *
+
+    _extras = True
+except ImportError:
+    _extras = False
 from transformers.tools import HfAgent
 
 
@@ -19,18 +26,12 @@ def ffmp(
 
     tools = [
         AudioAdjustmentTool(),
-        AudioDemuxTool(),
         AudioVideoMuxTool(),
         FFProbeTool(),
         ImageDirectoryToVideoTool(),
         ImageToVideoTool(),
-        ImageZoomPanTool(),
-        SpeechToSubtitleTool(),
-        VideoAutoCropTool(),
-        VideoCaptionTool(),
         VideoCropTool(),
         VideoFlipTool(),
-        VideoFrameClassifierTool(),
         VideoFrameSampleTool(),
         VideoGopChunkerTool(),
         VideoHTTPServerTool(),
@@ -39,15 +40,25 @@ def ffmp(
         VideoResizeTool(),
         VideoReverseTool(),
         VideoRotateTool(),
-        VideoSceneSplitTool(),
         VideoSegmentDeleteTool(),
         VideoSpeedTool(),
-        VideoStabilizationTool(),
         VideoStackTool(),
         VideoTrimTool(),
-        VideoTransitionTool(),
         VideoWatermarkTool(),
     ]
+
+    if _extras:
+        tools += [
+            AudioDemuxTool(),
+            ImageZoomPanTool(),
+            SpeechToSubtitleTool(),
+            VideoAutoCropTool(),
+            VideoCaptionTool(),
+            VideoFrameClassifierTool(),
+            VideoSceneSplitTool(),
+            VideoStabilizationTool(),
+            VideoTransitionTool(),
+        ]
 
     ffmp = HfAgent(url_endpoint, additional_tools=tools)
     return ffmp.run(prompt, run_prompt_template=template)
