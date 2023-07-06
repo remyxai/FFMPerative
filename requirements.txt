@@ -6,8 +6,6 @@ ffmpeg-python
 huggingface_hub>=0.14.1
 transformers>=4.30.0
 diffusers
-demucs
-scenedetect
 accelerate
 datasets
 torch

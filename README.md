@@ -25,9 +25,10 @@ FFMPerative is your copilot for video production workflows. Powered by Large Lan
 
 ## Setup 
 
-### Debian Package
+
+### Debian Package (recommended)
 For debian, build and install the package:
-```
+```bash
 dpkg-deb --build package_build/ ffmperative.deb
 sudo dpkg -i ffmperative.deb
 ```
@@ -35,6 +36,7 @@ Configure the package to mount the directory at `/home/$(hostname)/Videos/` by r
 ```
 echo -e "HUGGINGFACE_TOKEN=$HUGGINGFACE_TOKEN\nVIDEOS_PATH=/home/$(hostname)/Videos" | sudo tee /etc/ffmperative/config
 ```
+
 
 ## Quickstart
 
@@ -64,19 +66,19 @@ FFMPerative excels in task compositition. For instance, [curate video highlights
 ### Windows & Mac Setup
 #### Get the Docker Image
 Pull an image from DockerHub:
-```
+```bash
 docker pull smellslikeml/ffmperative:latest
 ```
 
 Or clone this repo and build an image with the `Dockerfile`:
-```
+```bash
 git clone https://github.com/remyxai/FFMPerative.git
 cd FFMPerative
 docker build -t ffmperative .
 ```
 
 #### Run FFMPerative in a Container
-```
+```bash
 docker run -it -e HUGGINGFACE_TOKEN='YOUR_HF_TOKEN' -v /path/to/dir:/path/to/dir --entrypoint /bin/bash ffmperative:latest
 ```
 
@@ -84,13 +86,32 @@ docker run -it -e HUGGINGFACE_TOKEN='YOUR_HF_TOKEN' -v /path/to/dir:/path/to/dir
 ## Features
 
 ### Python Usage
+It's not required to install FFMPerative as a Debian package. If `ffmpeg` is already available on your system, you can simply install FFMPerative through pip.
 
-You can also use FFMPerative in your Python projects. Simply import the library and pass your command as a string to `ffmp`.
+#### Base Installation
+You can install the base version of ffmperative with:
+```bash
+# from PyPI
+pip install ffmperative
+
+# from source
+git clone https://github.com/remyxai/ffmperative.git
+cd ffmperative
+pip install .
+```
+
+#### Usage
+Simply import the library and pass your command as a string to `ffmp`.
 
 ```python
 from ffmperative import ffmp
 
 ffmp("sample the 5th frame from '/path/to/video.mp4'")
+```
+
+You can also use the cli with:
+```bash
+ffmp do --p "sample the 5th frame from '/path/to/video.mp4'"
 ```
 
 ### Notebooks
