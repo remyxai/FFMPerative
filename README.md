@@ -1,6 +1,9 @@
 # FFMPerative
 <p align="center">
   <img src="https://github.com/remyxai/FFMPerative/blob/main/assets/ffmperative.gif" height=400px>
+  <img src="https://img.shields.io/pypi/v/ffmperative.svg">
+  <img src="https://img.shields.io/github/license/remyxai/ffmperative.svg">
+  <img src="https://img.shields.io/docker/v/smellslikeml/ffmp">
 </p>
 
 ## Video Production at the Speed of Chat
