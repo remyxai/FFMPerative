@@ -13,7 +13,7 @@ FFMPerative is your copilot for video editing workflows. Powered by Large Langua
 * Get Video Metadata
 * Sample Image from Video
 * Change Video Playback Speed
-* Apply FFmpeg xfade transition filters
+* Apply FFmpeg [xfade transition filters](https://trac.ffmpeg.org/wiki/Xfade#Gallery)
 * Resize, Crop, Flip, Reverse Video/GIF
 * Make a Video from a Directory of Images 
 * Overlay Image & Video for Picture-in-Picture
