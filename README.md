@@ -24,7 +24,7 @@ FFMPerative is your copilot for video editing workflows. Powered by Large Langua
 * Split Video by N-second Gops or with Scene Detection
 * Image Classifier Inference on every N-th Video Frame
 
-Just describe your desired edits similar to [these examples](https://remyxai.github.io/FFMPerative/)
+Just describe your desired edits similar to [these examples](https://remyxai.github.io/FFMPerative/).
 
 ## Setup 
 
