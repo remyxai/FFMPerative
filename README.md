@@ -53,7 +53,7 @@ ffmperative "split the video '/path/to/my_video.mp4' by scene"
 Try adding closed-captions with:
 
 ```bash
-ffmperative "merge subtitles 'captions.srt' with video 'my_video.mp4' calling it 'my_video_captioned.mp4'"
+ffmperative "merge subtitles 'captions.srt' with video 'video.mp4' calling it 'video_caps.mp4'"
 ```
 
 FFMPerative excels in task compositition. For instance, [curate video highlights](https://blog.remyx.ai/posts/data-processing-agents/) by analyzing speech transcripts:
