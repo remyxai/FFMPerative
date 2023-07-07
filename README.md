@@ -60,6 +60,8 @@ FFMPerative excels in task compositition. For instance, [curate video highlights
 
 ![smart_trim](https://blog.remyx.ai/img/ffmperative-auto-edit-pipeline.png#center)
 
+[More Examples](https://remyxai.github.io/FFMPerative/)
+
 ## Features
 
 ### Python Usage
