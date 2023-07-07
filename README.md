@@ -3,6 +3,7 @@
   <img src="https://github.com/remyxai/FFMPerative/blob/main/assets/ffmperative.gif" height=400px>
   <br>
   <img src="https://img.shields.io/pypi/v/ffmperative.svg">
+  <img src="https://img.shields.io/pypi/dm/ffmperative">
   <img src="https://img.shields.io/github/license/remyxai/ffmperative.svg">
   <img src="https://img.shields.io/docker/v/smellslikeml/ffmperative/latest">
   <img src="https://img.shields.io/docker/pulls/smellslikeml/ffmperative">
