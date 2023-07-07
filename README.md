@@ -5,6 +5,8 @@
   <img src="https://img.shields.io/pypi/v/ffmperative.svg">
   <img src="https://img.shields.io/github/license/remyxai/ffmperative.svg">
   <img src="https://img.shields.io/docker/v/smellslikeml/ffmperative/latest">
+  <img src="https://img.shields.io/docker/pulls/smellslikeml/ffmperative">
+
 </p>
 
 ## Video Production at the Speed of Chat
