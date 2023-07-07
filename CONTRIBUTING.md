@@ -19,7 +19,7 @@ docker build -t ffmperative .
 
 #### Run FFMPerative in a Container
 ```bash
-docker run -it -e HUGGINGFACE_TOKEN='YOUR_HF_TOKEN' -v /path/to/dir:/path/to/dir --entrypoint /bin/bash ffmperative:latest
+docker run -it -e HUGGINGFACE_TOKEN='YOUR_HF_TOKEN' -v /Videos:/Videos --entrypoint /bin/bash ffmperative:latest
 ```
 
 ### Build a Debian Package from Source
