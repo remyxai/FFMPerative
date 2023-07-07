@@ -2,14 +2,12 @@
 
 * Have a video processing workflow in mind? Want to contribute to our project? We'd love to hear from you! Raise an issue and we'll work together to design it.
 
-### Building a Wheel
+### Install From Source
 ```
-cd FFMPerative
-python3 -m build --wheel
-```
-Now you can install the wheel with pip:
-```
-pip install dist/ffmperative-X.X.X-py3-none-any.whl
+git clone https://github.com/remyxai/ffmperative.git
+cd ffmperative
+pip install .
+
 ```
 
 ### Building a Docker Image & Running a Container
