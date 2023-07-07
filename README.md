@@ -100,21 +100,6 @@ Explore our notebooks for practical applications of FFMPerative:
 
 * [Automatically Edit Videos from Google Drive in Colab](https://colab.research.google.com/drive/149byzCNd17dAehVuWXkiFQ2mVe_icLCa?usp=sharing)
 
-### Roadmap
-
-- [x] Basic Video Tools
-- [x] Release to PyPI after Agents are Added to Transformers
-- [x] Add ML-enabled Tools: [demucs](https://github.com/facebookresearch/demucs), [PySceneDetect](https://github.com/Breakthrough/PySceneDetect) 
-- [x] Docker Image with Latest FFmpeg
-- [ ] Host .deb package for `apt-get` installation
-- [ ] Release LLM checkpoint fine-tuned to use FFMPerative Tools
-
-
-### Contributing
-
-* Have a video processing workflow in mind? Want to contribute to our project? We'd love to hear from you! Raise an issue and we'll work together to design it.
-
-
 ### Resources
 * [Huggingface Transformers Agents](https://huggingface.co/docs/transformers/transformers_agents)
 * [ffmpeg-python](https://github.com/kkroening/ffmpeg-python/)
