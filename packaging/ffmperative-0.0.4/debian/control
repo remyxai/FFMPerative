@@ -1,0 +1,11 @@
+Source: ffmperative
+Section: custom
+Priority: optional
+Maintainer: Remyx AI <contact@remyx.ai>
+Build-Depends: debhelper-compat (= 12), docker-ce
+Standards-Version: 4.5.0
+
+Package: ffmperative
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, docker-ce
+Description: FFMPerative - video editing through chat using ffmpeg
