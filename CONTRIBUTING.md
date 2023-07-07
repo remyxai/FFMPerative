@@ -7,7 +7,6 @@
 git clone https://github.com/remyxai/ffmperative.git
 cd ffmperative
 pip install .
-
 ```
 
 ### Building a Docker Image & Running a Container
