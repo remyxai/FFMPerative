@@ -24,15 +24,21 @@ FFMPerative is your copilot for video production workflows. Powered by Large Lan
 
 ## Setup 
 
-### Debian Package (Recommended)
-For debian, build and install the package:
+### Ubuntu (Recommended)
+Install the package via aptitude:
+
 ```bash
-dpkg-deb --build package_build/ ffmperative.deb
-sudo dpkg -i ffmperative.deb
+# add our PPA
+sudo add-apt-repository ppa:remyxai/ppa
+sudo apt update
+
+# install
+sudo apt-get install ffmperative
 ```
-Configure the package to mount the directory at `/home/$(hostname)/Videos/` by running:
-```
-echo -e "HUGGINGFACE_TOKEN=$HUGGINGFACE_TOKEN\nVIDEOS_PATH=/home/$(hostname)/Videos" | sudo tee /etc/ffmperative/config
+
+Configure with your huggingface token and your preferred video directory
+```bash
+ffmperative configure
 ```
 
 For Windows & Mac, see [Docker Setup](docker/README.md).

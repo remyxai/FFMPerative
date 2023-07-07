@@ -9,11 +9,11 @@ if [[ "$1" == "configure" ]]; then
     read VIDEOS_PATH
 
     # Save the configuration
-    echo -e "HUGGINGFACE_TOKEN=$HUGGINGFACE_TOKEN\nVIDEOS_PATH=$VIDEOS_PATH" | sudo tee /etc/myapp/config
+    echo -e "HUGGINGFACE_TOKEN=$HUGGINGFACE_TOKEN\nVIDEOS_PATH=$VIDEOS_PATH" | sudo tee /etc/ffmperative/config
 else
     # Load the configuration file
-    if [[ -f "/etc/myapp/config" ]]; then
-        source /etc/myapp/config
+    if [[ -f "/etc/ffmperative/config" ]]; then
+        source /etc/ffmperative/config
     else
         echo "Error: Configuration file not found. Run 'ffmperative configure' to create it."
         exit 1
