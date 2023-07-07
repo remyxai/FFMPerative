@@ -50,7 +50,7 @@ Similarly, it's simple to split a long video into short clips via scene detectio
 ffmperative "split the video '/path/to/my_video.mp4' by scene"
 ```
 
-Try adding closed-captions with:
+Or to add closed-captions with:
 
 ```bash
 ffmperative "merge subtitles 'captions.srt' with video 'video.mp4' calling it 'video_caps.mp4'"
