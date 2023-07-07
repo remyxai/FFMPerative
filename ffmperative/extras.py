@@ -9,6 +9,7 @@ import subprocess
 import numpy as np
 import onnxruntime as rt
 import demucs.separate
+from typing import Optional
 from scenedetect import detect, ContentDetector, split_video_ffmpeg
 from collections import Counter
 from transformers import Tool
@@ -126,7 +127,7 @@ class SpeechToSubtitleTool(Tool):
         batch_size: int = 16,
     ):
         if not highlight_words:
-            self.generate_srt(input_path, output_path)
+            self.generate_srt(input_path, output_path, batch_size)
         else:
             audio = whisperx.load_audio(input_path)
             result = self.model.transcribe(audio, batch_size=batch_size)
@@ -148,16 +149,16 @@ class SpeechToSubtitleTool(Tool):
                     for word_timing in segment["words"]:
                         words.append(word_timing["word"])
 
-                    for i, word in enumerate(words):
-                        highlighted_text = " ".join(
-                            ["<u>" + word + "</u>" if word == w else w for w in words]
-                        )
+                    highlighted_text = " ".join(
+                        ["<u>" + word + "</u>" if word == w else w for w in words]
+                    )
 
-                        outfile.write(
-                            "{}\n{} --> {}\n{}\n\n".format(
-                                idx + 1, start_time_srt, end_time_srt, highlighted_text
-                            )
+                    # Write to SRT file
+                    outfile.write(
+                        "{}\n{} --> {}\n{}\n\n".format(
+                            idx + 1, start_time_srt, end_time_srt, highlighted_text
                         )
+                    )
 
 
 class VideoAutoCropTool(Tool):
@@ -215,7 +216,7 @@ class VideoCaptionTool(Tool):
     name = "video_caption_tool"
     description = """
     This tool subtitles/captions a video with a text overlay from a .srt subtitle file. 
-    Inputs are input_path, output_path, srt_path.
+    Inputs are input_path, output_path, srt_path and optional input subtitle_style defaults to "Fontsize=24,PrimaryColour=&H0000ff&"
     """
     inputs = ["text", "text", "text", "text"]
     outputs = ["None"]
@@ -225,7 +226,7 @@ class VideoCaptionTool(Tool):
         input_path: str,
         output_path: str,
         srt_path: str,
-        subtitle_style: str = None,
+        subtitle_style: Optional[str] = "Fontsize=24,PrimaryColour=&H0000ff&",
     ):
         if input_path == output_path:
             output_path = modify_file_name(output_path, "cap_")
