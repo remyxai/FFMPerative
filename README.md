@@ -8,7 +8,7 @@
 </p>
 
 ## Video Production at the Speed of Chat
-FFMPerative is your copilot for video production workflows. Powered by Large Language Models (LLMs) and an intuitive chat interface, it makes complex tasks as simple as typing a sentence. Leverage the power of FFmpeg and cutting-edge machine learning tools without dealing with complex command-line arguments or scripts.
+FFMPerative is your copilot for video editing workflows. Powered by Large Language Models (LLMs) through an intuitive chat interface, now you can compose video edits by chat. Integrate FFmpeg and cutting-edge machine learning tools without dealing with complex command-line arguments or scripts.
 
 * Get Video Metadata
 * Sample Image from Video
