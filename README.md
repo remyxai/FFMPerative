@@ -75,7 +75,7 @@ FFMPerative excels in task compositition. For instance, [curate video highlights
 ## Features
 
 ### Python Usage
-With `ffmpeg` is available on your system, you can make a lightweight installation of FFMPerative through pip.
+With `ffmpeg` installed on your system, you can opt for the minimal installation of FFMPerative through pip.
 
 #### Setup
 Make the minimal install of ffmperative with:
