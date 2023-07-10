@@ -43,13 +43,12 @@ class AudioVideoMuxTool(Tool):
         input_video = ffmpeg.input(input_path)
         added_audio = ffmpeg.input(audio_path)
 
-        merged_audio = ffmpeg.filter([input_video.audio, added_audio], "amix")
-
-        (
-            ffmpeg.concat(input_video, merged_audio, v=1, a=1)
-            .output(output_path)
-            .run(overwrite_output=True)
-        )
+        if has_audio(input_path):
+            merged_audio = ffmpeg.filter([input_video.audio, added_audio], "amix")
+            output_video = ffmpeg.concat(input_video, merged_audio, v=1, a=1)
+        else:
+            output_video = ffmpeg.concat(input_video, added_audio, v=1, a=1)
+        output_video.output(output_path).run(overwrite_output=True)
 
 
 class FFProbeTool(Tool):
