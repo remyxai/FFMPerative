@@ -150,7 +150,7 @@ class SpeechToSubtitleTool(Tool):
                         words.append(word_timing["word"])
 
                     highlighted_text = " ".join(
-                        ["<u>" + word + "</u>" if word == w else w for w in words]
+                        ["<u>" + word + "</u>" if j == idx else word for j, word in enumerate(words)]
                     )
 
                     # Write to SRT file
