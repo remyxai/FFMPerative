@@ -108,6 +108,7 @@ Explore our notebooks for practical applications of FFMPerative:
 ### Resources
 * [Huggingface Transformers Agents](https://huggingface.co/docs/transformers/transformers_agents)
 * [ffmpeg-python](https://github.com/kkroening/ffmpeg-python/)
+* [Sample FFMPerative Dataset](https://huggingface.co/datasets/remyxai/ffmperative-sample)
 * [FFMPerative LLaMA2 checkpoint](https://huggingface.co/remyxai/ffmperative-7b)
 
 ### Community
