@@ -99,6 +99,12 @@ You can also use the command-line interface:
 ffmp do --p "sample the 5th frame from '/path/to/video.mp4'"
 ```
 
+### Compose 🎞️ 
+Use the `compose` call to compose clips into an edited video. 
+```bash
+ffmp compose --clips /path/to/video/dir --output /path/to/my_video.mp4
+```
+
 ### Notebooks
 
 Explore our notebooks for practical applications of FFMPerative:
