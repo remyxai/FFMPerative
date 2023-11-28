@@ -100,9 +100,9 @@ ffmp do --p "sample the 5th frame from '/path/to/video.mp4'"
 ```
 
 ### Compose 🎞️ 
-Use the `compose` call to compose clips into an edited video. 
+Use the `compose` call to compose clips into an edited video. Use the optional `--prompt` flag to guide the composition by text prompt.
 ```bash
-ffmp compose --clips /path/to/video/dir --output /path/to/my_video.mp4
+ffmp compose --clips /path/to/video/dir --output /path/to/my_video.mp4 --prompt "Edit the video for social media"
 ```
 
 ### Notebooks

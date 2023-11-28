@@ -44,8 +44,17 @@ def post_json_to_endpoint(json_data, url):
     response = requests.post(url, json=json_data, headers=headers)
     return response
 
-def call_director(video_directory):
+def call_director(video_directory, user_instructions=None):
     json_data = process_video_directory(video_directory)
+
+    # Add user instructions to the JSON data
+    if user_instructions:
+        json_data = {
+            'videos': json_data,
+            'user_instructions': user_instructions
+        }
+    else:
+        json_data = {'videos': json_data}
 
     # Endpoint URL
     endpoint_url = 'https://engine.remyx.ai/api/v1.0/task/b_roll/compose'

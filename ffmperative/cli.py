@@ -20,7 +20,8 @@ def main():
     # Parser for 'compose' action
     compose_parser = subparsers_action.add_parser("compose", help="Compose clips into a video")
     compose_parser.add_argument("--clips", required=True, help="Path to clips directory")
-    compose_parser.add_argument("--output", required=False, default="composed_video.mp4", help="Filename for edited video. Default is `composed_video.mp4`")
+    compose_parser.add_argument("--prompt", required=False, default=None, help="Guide the composition by text prompt e.g. 'Edit the video for social media'")
+    compose_parser.add_argument("--output", required=False, default="composed_video.mp4", help="Filename for edited video. Default is 'composed_video.mp4'")
     compose_parser.add_argument(
         "--url_endpoint",
         default="https://api-inference.huggingface.co/models/bigcode/starcoder",
@@ -33,7 +34,7 @@ def main():
         results = ffmp(args.prompt, url_endpoint=args.url_endpoint)
         pprint(results)
     elif args.action == "compose":
-        compose_plans, join_plan = call_director(args.clips)
+        compose_plans, join_plan = call_director(args.clips, args.prompt)
         for plan in compose_plans:
             ffmp(plan, url_endpoint=args.url_endpoint)
         results = process_and_concatenate_clips(join_plan, args.output)
