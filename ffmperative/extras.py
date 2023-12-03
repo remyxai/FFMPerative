@@ -12,12 +12,50 @@ import demucs.separate
 from typing import Optional
 from scenedetect import detect, ContentDetector, split_video_ffmpeg
 from collections import Counter
-from transformers import Tool
 from .utils import modify_file_name, get_video_info
 
+class Tool:
+    """
+    A base class for the functions used by the agent. Subclass this and implement the `__call__` method as well as the
+    following class attributes:
+
+    - **description** (`str`) -- A short description of what your tool does, the inputs it expects and the output(s) it
+      will return. For instance 'This is a tool that downloads a file from a `url`. It takes the `url` as input, and
+      returns the text contained in the file'.
+    - **name** (`str`) -- A performative name that will be used for your tool in the prompt to the agent. For instance
+      `"text-classifier"` or `"image_generator"`.
+    - **inputs** (`List[str]`) -- The list of modalities expected for the inputs (in the same order as in the call).
+      Modalitiies should be `"text"`, `"image"` or `"audio"`. This is only used by `launch_gradio_demo` or to make a
+      nice space from your tool.
+    - **outputs** (`List[str]`) -- The list of modalities returned but the tool (in the same order as the return of the
+      call method). Modalitiies should be `"text"`, `"image"` or `"audio"`. This is only used by `launch_gradio_demo`
+      or to make a nice space from your tool.
+
+    You can also override the method [`~Tool.setup`] if your tool as an expensive operation to perform before being
+    usable (such as loading a model). [`~Tool.setup`] will be called the first time you use your tool, but not at
+    instantiation.
+    """
+
+    description: str = "This is a tool that ..."
+    name: str = ""
+
+    inputs: List[str]
+    outputs: List[str]
+
+    def __init__(self, *args, **kwargs):
+        self.is_initialized = False
+
+    def __call__(self, *args, **kwargs):
+        return NotImplemented("Write this method in your subclass of `Tool`.")
+
+    def setup(self):
+        """
+        Overwrite this method here for any operation that is expensive and needs to be executed before you start using
+        your tool. Such as loading a big model.
+        """
+        self.is_initialized = True
 
 class AudioDemuxTool(Tool):
-    name = "audio_demux_tool"
     description = """
     This tool performs music source separation to demux vocals
     from audio, good for kareoke or filtering background noise. 
@@ -33,7 +71,6 @@ class AudioDemuxTool(Tool):
 
 
 class ImageZoomPanTool(Tool):
-    name = "image_zoompan_tool"
     description = """
     This tool creates a video by applying the zoompan filter for a Ken Burns effect on image.
     Inputs are input_path, output_path, zoom_factor.
@@ -50,7 +87,6 @@ class ImageZoomPanTool(Tool):
 
 
 class SpeechToSubtitleTool(Tool):
-    name = "speech_to_subtitle_tool"
     description = """
     This tool generates .srt (SubRip) caption files using speech-to-text (STT). 
     Inputs are input_path for audio/video sources and output_path for caption file.
@@ -254,7 +290,6 @@ class SpeechToSubtitleTool(Tool):
 
 
 class VideoAutoCropTool(Tool):
-    name = "auto_crop_tool"
     description = """
     This tool automatically crops a video.
     Inputs are input_path as a string and output_path as a string.
@@ -305,7 +340,6 @@ class VideoAutoCropTool(Tool):
 
 
 class VideoCaptionTool(Tool):
-    name = "video_caption_tool"
     description = """
     This tool subtitles/captions a video with a text overlay from a .srt subtitle file. 
     Inputs are input_path, output_path, srt_path and optional input subtitle_style defaults to "Fontsize=24,PrimaryColour=&H0000ff&"
@@ -334,7 +368,6 @@ class VideoCaptionTool(Tool):
 
 
 class VideoFrameClassifierTool(Tool):
-    name = "video_frame_classifier_tool"
     description = """
     This tool classifies frames from video input using a given ONNX model.
     Inputs are input_path, model_path, and n (infer every nth frame, skip n frames).
@@ -389,7 +422,6 @@ class VideoFrameClassifierTool(Tool):
 
 
 class VideoSceneSplitTool(Tool):
-    name = "scene_split_tool"
     description = """
     This tool performs scene detection and splitting. 
     Inputs are input_path.
@@ -403,7 +435,6 @@ class VideoSceneSplitTool(Tool):
 
 
 class VideoStabilizationTool(Tool):
-    name = "video_stabilization_tool"
     description = """
     This tool stabilizes a video.
     Inputs are input_path, output_path, smoothing, zoom.
@@ -439,7 +470,6 @@ class VideoStabilizationTool(Tool):
 
 
 class VideoTransitionTool(Tool):
-    name = "xfade_transition_tool"
     description = """
     This tool applies a xfade filter transitions between two videos.
     Inputs are input_path1, input_path2, output_path, transition_type, duration, and offset.
