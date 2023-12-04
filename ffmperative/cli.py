@@ -36,7 +36,10 @@ def main():
     elif args.action == "compose":
         compose_plans, join_plan = call_director(args.clips, args.prompt)
         for plan in compose_plans:
-            ffmp(plan, url_endpoint=args.url_endpoint)
+            try:
+                ffmp(plan, url_endpoint=args.url_endpoint)
+            except:
+                print("error: ", plan)
         results = process_and_concatenate_clips(join_plan, args.output)
         pprint(results)
     else:
