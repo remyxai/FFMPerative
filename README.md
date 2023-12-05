@@ -29,42 +29,26 @@ Just describe your desired edits similar to [these examples](https://remyxai.git
 
 ## Setup 
 
-### Ubuntu (Recommended)
-Install the package via aptitude:
-
-```bash
-# add our PPA
-sudo add-apt-repository ppa:remyxai/ppa
-sudo apt update
-
-# install
-sudo apt-get install ffmperative
-```
-
-Configure with your huggingface token and your preferred video directory
-```bash
-ffmperative configure
-```
-
-For Windows & Mac, see [Docker Setup](docker/README.md).
+See [Docker Setup](docker/README.md).
+You can pull the prebuilt image [smellslikeml/ffmperative:0.0.6-min](https://hub.docker.com/layers/smellslikeml/ffmperative/0.0.6-min/images/sha256-833489f673f7f2153d4c59b2fcfdd54baf181533c8196a3abedcf4d362bfddc2?context=repo)
 
 ## Quickstart
 To sample an image from a video clip, simply run FFMPerative from the command-line:
 
 ```bash
-ffmperative "sample the 5th frame from /path/to/video.mp4"
+ffmp do --prompt "sample the 5th frame from /path/to/video.mp4"
 ```
 
 Similarly, it's simple to split a long video into short clips via scene detection:
 
 ```bash
-ffmperative "split the video '/path/to/my_video.mp4' by scene"
+ffmp do --prompt "split the video '/path/to/my_video.mp4' by scene"
 ```
 
 Or to add closed-captions with:
 
 ```bash
-ffmperative "merge subtitles 'captions.srt' with video 'video.mp4' calling it 'video_caps.mp4'"
+ffmp do --prompt "merge subtitles 'captions.srt' with video 'video.mp4' calling it 'video_caps.mp4'"
 ```
 
 FFMPerative excels in task compositition. For instance, [curate video highlights](https://blog.remyx.ai/posts/data-processing-agents/) by analyzing speech transcripts:
@@ -81,8 +65,7 @@ With `ffmpeg` installed on your system, you can opt for the minimal installation
 Make the minimal install of ffmperative with:
 
 ```bash
-# from PyPI
-pip install ffmperative
+pip install git+https://github.com/remyxai/FFMPerative.git@minimal_pkg
 ```
 
 #### Usage
