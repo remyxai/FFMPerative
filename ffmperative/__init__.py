@@ -4,6 +4,7 @@ import pkg_resources
 from sys import argv
 
 from . import tools as t
+from .prompts import MAIN_PROMPT
 
 from interpretor import evaluate
 
@@ -32,22 +33,19 @@ tools = {
 
 
 def run(prompt):
-    ffmp_path = pkg_resources.resource_filename("ffmperative", "bin/ffmp")
-    safe_prompt = shlex.quote(prompt)
-    command = [ffmp_path, "-p", safe_prompt]
+    complete_prompt = MAIN_PROMPT.replace("<<prompt>>", prompt)
+    safe_prompt = shlex.quote(complete_prompt)
+
+    command = ["/ffmp/ffmp", "-p", safe_prompt]
 
     try:
-        # Run the command without using shell
         result = subprocess.run(command, capture_output=True, text=True, check=True)
 
-        # Get the standard output and split into lines
         output = result.stdout
         return output.split("### Assistant:")[2]
     except subprocess.CalledProcessError as e:
-        # Handle errors (e.g., log them, raise an exception, or return a default value)
         print(f"Error occurred: {e}")
         return None
-
 
 def ffmp(prompt, tools=tools):
     parsed_output = run(prompt)
