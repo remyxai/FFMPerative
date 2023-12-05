@@ -6,7 +6,7 @@ from sys import argv
 from . import tools as t
 from .prompts import MAIN_PROMPT
 
-from interpretor import evaluate
+from .interpreter import evaluate
 
 tools = {
     "AudioAdjustmentTool": t.AudioAdjustmentTool(),

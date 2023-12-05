@@ -5,6 +5,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN git clone https://github.com/remyxai/FFMPerative.git && \
     cd FFMPerative && \
     git checkout minimal_pkg && \
+    pip3 install requests && \
     pip3 install -r requirements.txt && \
     python3 setup.py install
 
