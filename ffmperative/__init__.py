@@ -1,63 +1,56 @@
-from .tools import *
+import shlex
+import subprocess
+import pkg_resources
+from sys import argv
 
-try:
-    from .extras import *
+from . import tools as t
 
-    _extras = True
-except ImportError:
-    _extras = False
+from interpretor import evaluate
 
-from transformers.tools import HfAgent
+tools = {
+    "AudioAdjustmentTool": t.AudioAdjustmentTool(),
+    "AudioVideoMuxTool": t.AudioVideoMuxTool(),
+    "FFProbeTool": t.FFProbeTool(),
+    "ImageDirectoryToVideoTool": t.ImageDirectoryToVideoTool(),
+    "ImageToVideoTool": t.ImageToVideoTool(),
+    "VideoCropTool": t.VideoCropTool(),
+    "VideoFlipTool": t.VideoFlipTool(),
+    "VideoFrameSampleTool": t.VideoFrameSampleTool(),
+    "VideoGopChunkerTool": t.VideoGopChunkerTool(),
+    "VideoHTTPServerTool": t.VideoHTTPServerTool(),
+    "VideoLetterBoxingTool": t.VideoLetterBoxingTool(),
+    "VideoOverlayTool": t.VideoOverlayTool(),
+    "VideoResizeTool": t.VideoResizeTool(),
+    "VideoReverseTool": t.VideoReverseTool(),
+    "VideoRotateTool": t.VideoRotateTool(),
+    "VideoSegmentDeleteTool": t.VideoSegmentDeleteTool(),
+    "VideoSpeedTool": t.VideoSpeedTool(),
+    "VideoStackTool": t.VideoStackTool(),
+    "VideoTrimTool": t.VideoTrimTool(),
+    "VideoWatermarkTool": t.VideoWatermarkTool(),
+}
 
 
-def ffmp(
-    prompt, url_endpoint="https://api-inference.huggingface.co/models/bigcode/starcoder"
-):
-    template = """
-    Human tasks Assistant with a video processing workflows. Assistant uses all tools to generate an execution plan.
+def run(prompt):
+    ffmp_path = pkg_resources.resource_filename("ffmperative", "bin/ffmp")
+    safe_prompt = shlex.quote(prompt)
+    command = [ffmp_path, "-p", safe_prompt]
 
-    Tools: <<all_tools>>
+    try:
+        # Run the command without using shell
+        result = subprocess.run(command, capture_output=True, text=True, check=True)
 
-    Task: <<prompt>>
+        # Get the standard output and split into lines
+        output = result.stdout
+        return output.split("### Assistant:")[2]
+    except subprocess.CalledProcessError as e:
+        # Handle errors (e.g., log them, raise an exception, or return a default value)
+        print(f"Error occurred: {e}")
+        return None
 
-    Answer:
-    """
 
-    tools = [
-        AudioAdjustmentTool(),
-        AudioVideoMuxTool(),
-        FFProbeTool(),
-        ImageDirectoryToVideoTool(),
-        ImageToVideoTool(),
-        VideoCropTool(),
-        VideoFlipTool(),
-        VideoFrameSampleTool(),
-        VideoGopChunkerTool(),
-        VideoHTTPServerTool(),
-        VideoLetterBoxingTool(),
-        VideoOverlayTool(),
-        VideoResizeTool(),
-        VideoReverseTool(),
-        VideoRotateTool(),
-        VideoSegmentDeleteTool(),
-        VideoSpeedTool(),
-        VideoStackTool(),
-        VideoTrimTool(),
-        VideoWatermarkTool(),
-    ]
-
-    if _extras:
-        tools += [
-            AudioDemuxTool(),
-            ImageZoomPanTool(),
-            SpeechToSubtitleTool(),
-            VideoAutoCropTool(),
-            VideoCaptionTool(),
-            VideoFrameClassifierTool(),
-            VideoSceneSplitTool(),
-            VideoStabilizationTool(),
-            VideoTransitionTool(),
-        ]
-
-    ffmp = HfAgent(url_endpoint, additional_tools=tools)
-    return ffmp.run(prompt, run_prompt_template=template)
+def ffmp(prompt, tools=tools):
+    parsed_output = run(prompt)
+    parsed_ast = ast.parse(parsed_output)
+    result = evaluate(parsed_ast, tools)
+    return result
