@@ -6,7 +6,6 @@ import pkg_resources
 from sys import argv
 
 from . import tools as t
-from .prompts import MAIN_PROMPT
 
 from .interpretor import evaluate, extract_function_calls
 
