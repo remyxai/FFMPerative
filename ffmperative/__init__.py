@@ -32,26 +32,21 @@ tools = {
     "VideoWatermarkTool": t.VideoWatermarkTool(),
 }
 
-def run(prompt, tools):
+def run(prompt):
     safe_prompt = shlex.quote(prompt)
     command = '/ffmp/ffmp -c 6000 -p "{}"'.format(safe_prompt)
 
     try:
         result = subprocess.run(command, capture_output=True, text=True, shell=True)
+
         output = result.stdout
-
-        # Extract valid function calls using regular expressions
-        pattern = '|'.join(re.escape(tool) for tool in tools.keys())
-        matches = re.findall(r'(' + pattern + r'\(.*?\))', output)
-        valid_output = ' '.join(matches)
-
-        return valid_output
+        return output.split("### Assistant:")[-1].strip()
     except subprocess.CalledProcessError as e:
         print(f"Error occurred: {e}")
         return None
 
 def ffmp(prompt, tools=tools):
-    parsed_output = run(prompt, tools)
+    parsed_output = run(prompt)
     if parsed_output:
         try:
             extracted_output = extract_function_calls(parsed_output, tools)
