@@ -50,7 +50,7 @@ def run(prompt, tools):
         print(f"Error occurred: {e}")
         return None
 
-def ffmp(prompt, tools):
+def ffmp(prompt, tools=tools):
     parsed_output = run(prompt, tools)
     if parsed_output:
         try:
