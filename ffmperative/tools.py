@@ -5,6 +5,8 @@ from PIL import Image
 from io import BytesIO
 from pathlib import Path
 
+from typing import List
+
 from .utils import get_video_info, has_audio
 
 class Tool:
