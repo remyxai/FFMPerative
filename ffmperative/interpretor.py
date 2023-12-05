@@ -1,3 +1,4 @@
+import re
 import ast
 import difflib
 from collections.abc import Mapping
@@ -11,6 +12,37 @@ class InterpretorError(ValueError):
     """
 
     pass
+
+def extract_function_calls(text, tools):
+    # Define the regex pattern for matching function names
+    pattern = '|'.join(re.escape(tool) for tool in tools)
+
+    # Find all occurrences of the tool names
+    tool_occurrences = [(m.start(), m.group()) for m in re.finditer(pattern, text)]
+
+    function_calls = []
+    for start, tool in tool_occurrences:
+        # Find the opening parenthesis of the function call
+        open_paren = text.find('(', start)
+        if open_paren == -1:
+            continue
+
+        # Count the parentheses to find the matching closing parenthesis
+        end_paren, nested_paren = open_paren, 0
+        for char in text[open_paren:]:
+            if char == '(':
+                nested_paren += 1
+            elif char == ')':
+                nested_paren -= 1
+                if nested_paren == 0:
+                    break
+            end_paren += 1
+
+        # Extract the function call
+        function_call = text[start:end_paren + 1]
+        function_calls.append(function_call)
+
+    return "\n".join(function_calls)
 
 
 def evaluate(code: str, tools: Dict[str, Callable], state=None, chat_mode=False):

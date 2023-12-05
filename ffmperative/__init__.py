@@ -1,3 +1,5 @@
+import re
+import ast
 import shlex
 import subprocess
 import pkg_resources
@@ -6,7 +8,7 @@ from sys import argv
 from . import tools as t
 from .prompts import MAIN_PROMPT
 
-from .interpretor import evaluate
+from .interpretor import evaluate, extract_function_calls
 
 tools = {
     "AudioAdjustmentTool": t.AudioAdjustmentTool(),
@@ -31,24 +33,33 @@ tools = {
     "VideoWatermarkTool": t.VideoWatermarkTool(),
 }
 
-
-def run(prompt):
-    complete_prompt = MAIN_PROMPT.replace("<<prompt>>", prompt)
-    safe_prompt = shlex.quote(complete_prompt)
-
-    command = ["/ffmp/ffmp", "-p", safe_prompt]
+def run(prompt, tools):
+    safe_prompt = shlex.quote(prompt)
+    command = '/ffmp/ffmp -c 6000 -p "{}"'.format(safe_prompt)
 
     try:
-        result = subprocess.run(command, capture_output=True, text=True, check=True)
-
+        result = subprocess.run(command, capture_output=True, text=True, shell=True)
         output = result.stdout
-        return output.split("### Assistant:")[2]
+
+        # Extract valid function calls using regular expressions
+        pattern = '|'.join(re.escape(tool) for tool in tools.keys())
+        matches = re.findall(r'(' + pattern + r'\(.*?\))', output)
+        valid_output = ' '.join(matches)
+
+        return valid_output
     except subprocess.CalledProcessError as e:
         print(f"Error occurred: {e}")
         return None
 
-def ffmp(prompt, tools=tools):
-    parsed_output = run(prompt)
-    parsed_ast = ast.parse(parsed_output)
-    result = evaluate(parsed_ast, tools)
-    return result
+def ffmp(prompt, tools):
+    parsed_output = run(prompt, tools)
+    if parsed_output:
+        try:
+            extracted_output = extract_function_calls(parsed_output, tools)
+            parsed_ast = ast.parse(extracted_output)
+            result = evaluate(parsed_ast, tools)
+            return result
+        except SyntaxError as e:
+            print(f"Syntax error in parsed output: {e}")
+    else:
+        return None
