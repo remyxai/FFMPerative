@@ -1,40 +1,25 @@
+import os
 import re
 import ast
 import shlex
+import requests
 import subprocess
 import pkg_resources
 from sys import argv
 
 from . import tools as t
-
+from .utils import download_model
+from .prompts import MAIN_PROMPT
+from .tool_mapping import generate_tools_mapping
 from .interpretor import evaluate, extract_function_calls
 
-tools = {
-    "AudioAdjustmentTool": t.AudioAdjustmentTool(),
-    "AudioVideoMuxTool": t.AudioVideoMuxTool(),
-    "FFProbeTool": t.FFProbeTool(),
-    "ImageDirectoryToVideoTool": t.ImageDirectoryToVideoTool(),
-    "ImageToVideoTool": t.ImageToVideoTool(),
-    "VideoCropTool": t.VideoCropTool(),
-    "VideoFlipTool": t.VideoFlipTool(),
-    "VideoFrameSampleTool": t.VideoFrameSampleTool(),
-    "VideoGopChunkerTool": t.VideoGopChunkerTool(),
-    "VideoHTTPServerTool": t.VideoHTTPServerTool(),
-    "VideoLetterBoxingTool": t.VideoLetterBoxingTool(),
-    "VideoOverlayTool": t.VideoOverlayTool(),
-    "VideoResizeTool": t.VideoResizeTool(),
-    "VideoReverseTool": t.VideoReverseTool(),
-    "VideoRotateTool": t.VideoRotateTool(),
-    "VideoSegmentDeleteTool": t.VideoSegmentDeleteTool(),
-    "VideoSpeedTool": t.VideoSpeedTool(),
-    "VideoStackTool": t.VideoStackTool(),
-    "VideoTrimTool": t.VideoTrimTool(),
-    "VideoWatermarkTool": t.VideoWatermarkTool(),
-}
+tools = generate_tools_mapping()
 
-def run(prompt):
+def run_local(prompt):
+    model_path = download_model()  # Ensure the model file is downloaded before running ffmp
+    ffmp_path = pkg_resources.resource_filename('ffmperative', 'bin/ffmp')
     safe_prompt = shlex.quote(prompt)
-    command = '/ffmp/ffmp -c 6000 -p "{}"'.format(safe_prompt)
+    command = '{} -m {} -p "{}"'.format(ffmp_path, model_path, safe_prompt)
 
     try:
         result = subprocess.run(command, capture_output=True, text=True, shell=True)
@@ -45,8 +30,36 @@ def run(prompt):
         print(f"Error occurred: {e}")
         return None
 
-def ffmp(prompt, tools=tools):
-    parsed_output = run(prompt)
+def run_remote(prompt):
+    stop=["Task:"]
+    complete_prompt = MAIN_PROMPT.replace("<<prompt>>", prompt.replace("'", "\\'").replace('"', '\\"'))
+    headers = {"Authorization": f"Bearer {os.environ.get('HF_ACCESS_TOKEN', '')}"}
+    inputs = {
+        "inputs": complete_prompt,
+        "parameters": {"max_new_tokens": 2048, "return_full_text": True, "stop":stop},
+    }
+
+    response = requests.post("https://api-inference.huggingface.co/models/bigcode/starcoder", json=inputs, headers=headers)
+    if response.status_code == 429:
+        logger.info("Getting rate-limited, waiting a tiny bit before trying again.")
+        time.sleep(1)
+        return run_remote(prompt)
+    elif response.status_code != 200:
+        raise ValueError(f"Error {response.status_code}: {response.json()}")
+
+    result = response.json()[0]["generated_text"]
+    for stop_seq in stop:
+        if result.endswith(stop_seq):
+            res = result[: -len(stop_seq)]
+            answer = res.split("Answer:")[-1].strip()
+            return answer 
+    return result
+
+def ffmp(prompt, local=False, tools=tools):
+    if local:
+        parsed_output = run_local(prompt)
+    else:
+        parsed_output = run_remote(prompt)
     if parsed_output:
         try:
             extracted_output = extract_function_calls(parsed_output, tools)

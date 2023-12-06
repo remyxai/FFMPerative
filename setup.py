@@ -13,13 +13,14 @@ setup(
     name="ffmperative",
     version="0.0.6",
     packages=find_packages(),
-    install_requires=read_requirements((this_directory / 'requirements.txt')),
-    extras_require={
-        'full':  read_requirements((this_directory / 'requirements_full.txt'))
+    include_package_data=True,
+    package_data={
+        'ffmperative': ['bin/ffmp'],
     },
+    install_requires=read_requirements((this_directory / 'requirements.txt')),
     entry_points={
         "console_scripts": [
-            "ffmp=ffmperative.cli:main",
+            "ffmperative=ffmperative.cli:main",
         ],
     },
     long_description=long_description,
