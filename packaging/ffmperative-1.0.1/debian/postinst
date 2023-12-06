@@ -1,4 +1,0 @@
-#!/bin/bash
-
-# Build the Docker image
-docker pull smellslikeml/ffmperative:latest

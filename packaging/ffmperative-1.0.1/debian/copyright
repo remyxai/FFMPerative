@@ -1,7 +1,0 @@
-Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: ffmperative
-Source: https://github.com/remyxai/FFMPerative
-
-Files: *
-Copyright: 2023 Remyx AI
-License: MIT

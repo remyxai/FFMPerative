@@ -4,13 +4,53 @@ import ffmpeg
 from PIL import Image
 from io import BytesIO
 from pathlib import Path
-from transformers import Tool
+
+from typing import List
 
 from .utils import get_video_info, has_audio
 
+class Tool:
+    """
+    A base class for the functions used by the agent. Subclass this and implement the `__call__` method as well as the
+    following class attributes:
+
+    - **description** (`str`) -- A short description of what your tool does, the inputs it expects and the output(s) it
+      will return. For instance 'This is a tool that downloads a file from a `url`. It takes the `url` as input, and
+      returns the text contained in the file'.
+    - **name** (`str`) -- A performative name that will be used for your tool in the prompt to the agent. For instance
+      `"text-classifier"` or `"image_generator"`.
+    - **inputs** (`List[str]`) -- The list of modalities expected for the inputs (in the same order as in the call).
+      Modalitiies should be `"text"`, `"image"` or `"audio"`. This is only used by `launch_gradio_demo` or to make a
+      nice space from your tool.
+    - **outputs** (`List[str]`) -- The list of modalities returned but the tool (in the same order as the return of the
+      call method). Modalitiies should be `"text"`, `"image"` or `"audio"`. This is only used by `launch_gradio_demo`
+      or to make a nice space from your tool.
+
+    You can also override the method [`~Tool.setup`] if your tool as an expensive operation to perform before being
+    usable (such as loading a model). [`~Tool.setup`] will be called the first time you use your tool, but not at
+    instantiation.
+    """
+
+    description: str = "This is a tool that ..."
+    name: str = ""
+
+    inputs: List[str]
+    outputs: List[str]
+
+    def __init__(self, *args, **kwargs):
+        self.is_initialized = False
+
+    def __call__(self, *args, **kwargs):
+        return NotImplemented("Write this method in your subclass of `Tool`.")
+
+    def setup(self):
+        """
+        Overwrite this method here for any operation that is expensive and needs to be executed before you start using
+        your tool. Such as loading a big model.
+        """
+        self.is_initialized = True
 
 class AudioAdjustmentTool(Tool):
-    name = "audio_adjustment_tool"
     description = """
     This tool modifies audio levels for an input video.
     Inputs are input_path, output_path, level (e.g. 0.5 or -13dB).
@@ -30,7 +70,6 @@ class AudioAdjustmentTool(Tool):
 
 
 class AudioVideoMuxTool(Tool):
-    name = "audio_video_mux_tool"
     description = """
     This tool muxes (combines) a video and an audio file.
     Inputs are input_path as a string, audio_path as a string, and output_path as a string.
@@ -52,7 +91,6 @@ class AudioVideoMuxTool(Tool):
 
 
 class FFProbeTool(Tool):
-    name = "ffprobe_tool"
     description = """
     This tool extracts metadata from input video using ffmpeg/ffprobe
     Input is input_path and output is video metadata as JSON.
@@ -66,7 +104,6 @@ class FFProbeTool(Tool):
 
 
 class ImageToVideoTool(Tool):
-    name = "image_to_video_tool"
     description = """
     This tool generates an N-second video clip from an image.
     Inputs are image_path, duration, output_path.
@@ -86,7 +123,6 @@ class ImageToVideoTool(Tool):
 
 
 class ImageDirectoryToVideoTool(Tool):
-    name = "image_directory_video_tool"
     description = """
     This tool creates video
     from a directory of images. Inputs
@@ -123,7 +159,6 @@ class ImageDirectoryToVideoTool(Tool):
 
 
 class VideoCropTool(Tool):
-    name = "video_crop_tool"
     description = """
     This tool crops a video with inputs: 
     input_path, output_path, 
@@ -157,7 +192,6 @@ class VideoCropTool(Tool):
 
 
 class VideoFlipTool(Tool):
-    name = "video_flip_tool"
     description = """
     This tool flips video along the horizontal 
     or vertical axis. Inputs are input_path, 
@@ -185,7 +219,6 @@ class VideoFlipTool(Tool):
 
 
 class VideoFrameSampleTool(Tool):
-    name = "video_frame_sample_tool"
     description = """
     This tool samples an image frame from an input video. 
     Inputs are input_path, output_path, and frame_number.
@@ -207,7 +240,6 @@ class VideoFrameSampleTool(Tool):
 
 
 class VideoGopChunkerTool(Tool):
-    name = "video_chunker_tool"
     description = """
     This tool segments video input into GOPs (Group of Pictures) chunks of 
     segment_length (in seconds). Inputs are input_path and segment_length.
@@ -236,7 +268,6 @@ class VideoGopChunkerTool(Tool):
 
 
 class VideoHTTPServerTool(Tool):
-    name = "video_http_server_tool"
     description = """
     This tool streams a source video to an HTTP server. 
     Inputs are input_path and server_url.
@@ -260,7 +291,6 @@ class VideoHTTPServerTool(Tool):
 
 
 class VideoLetterBoxingTool(Tool):
-    name = "video_letterboxing_tool"
     description = """
     This tool adds letterboxing to a video.
     Inputs are input_path, output_path, width, height, bg_color.
@@ -291,7 +321,6 @@ class VideoLetterBoxingTool(Tool):
 
 
 class VideoOverlayTool(Tool):
-    name = "video_overlay_tool"
     description = """
     This tool overlays one video on top of another.
     Inputs are main_video_path, overlay_video_path, output_path, x_position, y_position.
@@ -320,7 +349,6 @@ class VideoOverlayTool(Tool):
 
 
 class VideoReverseTool(Tool):
-    name = "video_reverse_tool"
     description = """
     This tool reverses a video. 
     Inputs are input_path and output_path.
@@ -339,7 +367,6 @@ class VideoReverseTool(Tool):
 
 
 class VideoResizeTool(Tool):
-    name = "video_resize_tool"
     description = """
     This tool resizes the video to the specified dimensions.
     Inputs are input_path, width, height, output_path.
@@ -357,7 +384,6 @@ class VideoResizeTool(Tool):
 
 
 class VideoRotateTool(Tool):
-    name = "video_rotate_tool"
     description = """
     This tool rotates a video by a specified angle. 
     Inputs are input_path, output_path and rotation_angle in degrees.
@@ -376,7 +402,6 @@ class VideoRotateTool(Tool):
 
 
 class VideoSegmentDeleteTool(Tool):
-    name = "segment_delete_tool"
     description = """
     This tool deletes a interval of video by timestamp.
     Inputs are input_path, output_path, start, end.
@@ -400,7 +425,6 @@ class VideoSegmentDeleteTool(Tool):
 
 
 class VideoSpeedTool(Tool):
-    name = "video_speed_tool"
     description = """
     This tool speeds up a video. 
     Inputs are input_path as a string, output_path as a string, speed_factor (float) as a string.
@@ -418,7 +442,6 @@ class VideoSpeedTool(Tool):
 
 
 class VideoStackTool(Tool):
-    name = "video_stack_tool"
     description = """
     This tool stacks two videos either vertically or horizontally based on the orientation parameter.
     Inputs are input_path, second_input, output_path, and orientation as strings.
@@ -443,7 +466,6 @@ class VideoStackTool(Tool):
 
 
 class VideoTrimTool(Tool):
-    name = "video_trim_tool"
     description = """
     This tool trims a video. Inputs are input_path, output_path, 
     start_time, and end_time. Format start(end)_time: HH:MM:SS
@@ -468,7 +490,6 @@ class VideoTrimTool(Tool):
 
 
 class VideoWatermarkTool(Tool):
-    name = "video_watermark_tool"
     description = """
     This tool adds logo image as watermark to a video. 
     Inputs are input_path, output_path, watermark_path.

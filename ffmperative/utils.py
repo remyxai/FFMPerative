@@ -8,6 +8,19 @@ import subprocess
 from pathlib import Path
 
 
+def download_model():
+    model_url = "https://remyx.ai/assets/model-0.0.6.gguf"
+    target_path = os.path.join(os.path.dirname(__file__), 'bin', 'model-0.0.6.gguf')
+
+    if not os.path.exists(target_path):
+        print("Downloading model assets...")
+        response = requests.get(model_url, stream=True)
+        with open(target_path, 'wb') as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                f.write(chunk)
+        print("Download complete.")
+    return target_path
+
 def extract_and_encode_frame(video_path):
     # Get the duration of the video
     probe = ffmpeg.probe(video_path)

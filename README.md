@@ -1,123 +1,80 @@
-# FFMPerative
+# FFMPerative - Chat to Compose Video
 <p align="center">
   <img src="https://github.com/remyxai/FFMPerative/blob/main/assets/ffmperative.gif" height=400px>
   <br>
   <img src="https://img.shields.io/pypi/v/ffmperative.svg">
   <img src="https://img.shields.io/pypi/dm/ffmperative">
   <img src="https://img.shields.io/github/license/remyxai/ffmperative.svg">
-  <img src="https://img.shields.io/docker/v/smellslikeml/ffmperative/latest">
-  <img src="https://img.shields.io/docker/pulls/smellslikeml/ffmperative">
 
 </p>
 
-## Video Production at the Speed of Chat
-FFMPerative is your copilot for video editing workflows. Powered by Large Language Models (LLMs) through an intuitive chat interface, now you can compose video edits in natural language. Integrate FFmpeg and cutting-edge machine learning tools without dealing with complex command-line arguments or scripts.
+FFMPerative is your copilot for video editing workflows. Powered by Large Language Models (LLMs) through an intuitive chat interface, now you can compose video edits in natural language to do things like:
 
-* Get Video Metadata
-* Sample Image from Video
-* Change Video Playback Speed
-* Apply FFmpeg [xfade transition filters](https://trac.ffmpeg.org/wiki/Xfade#Gallery)
-* Resize, Crop, Flip, Reverse Video/GIF
-* Make a Video from a Directory of Images 
-* Overlay Image & Video for Picture-in-Picture
-* Adjust Audio Levels, Background Noise Removal
+* Change Speed, Resize, Crop, Flip, Reverse Video/GIF
 * Speech-to-Text Transcription and Closed-Captions
-* Split Video by N-second Gops or with Scene Detection
-* Image Classifier Inference on every N-th Video Frame
 
-Just describe your desired edits similar to [these examples](https://remyxai.github.io/FFMPerative/).
+Just describe your changes like [these examples](https://remyxai.github.io/FFMPerative/).
 
 ## Setup 
 
-### Ubuntu (Recommended)
-Install the package via aptitude:
+### Requirements
+* Python 3 
+* [ffmpeg](https://ffmpeg.org)
 
-```bash
-# add our PPA
-sudo add-apt-repository ppa:remyxai/ppa
-sudo apt update
-
-# install
-sudo apt-get install ffmperative
+PyPI:
+```
+pip install ffmperative
 ```
 
-Configure with your huggingface token and your preferred video directory
-```bash
-ffmperative configure
+Or pip install from source:
+```
+git clone https://github.com/remyxai/FFMPerative.git
+cd FFMPerative && pip install .
 ```
 
-For Windows & Mac, see [Docker Setup](docker/README.md).
+`ffmperative` defaults to inference using the local model on CPU.
+To use the remotely hosted endpoint, set an environment variable with a huggingface token:
+
+```
+export HF_ACCESS_TOKEN=<your-token-here>
+```
+
+and use the optional `--remote` flag
 
 ## Quickstart
-To sample an image from a video clip, simply run FFMPerative from the command-line:
+Add closed-captions with:
 
 ```bash
-ffmperative "sample the 5th frame from /path/to/video.mp4"
+ffmperative do --prompt "merge subtitles 'captions.srt' with video 'video.mp4' calling it 'video_caps.mp4'"
 ```
-
-Similarly, it's simple to split a long video into short clips via scene detection:
-
-```bash
-ffmperative "split the video '/path/to/my_video.mp4' by scene"
-```
-
-Or to add closed-captions with:
-
-```bash
-ffmperative "merge subtitles 'captions.srt' with video 'video.mp4' calling it 'video_caps.mp4'"
-```
-
-FFMPerative excels in task compositition. For instance, [curate video highlights](https://blog.remyx.ai/posts/data-processing-agents/) by analyzing speech transcripts:
-
-![smart_trim](https://blog.remyx.ai/img/ffmperative-auto-edit-pipeline.png#center)
-
 
 ## Features
 
 ### Python Usage
-With `ffmpeg` installed on your system, you can opt for the minimal installation of FFMPerative through pip.
-
-#### Setup
-Make the minimal install of ffmperative with:
-
-```bash
-# from PyPI
-pip install ffmperative
-```
-
-#### Usage
 Simply import the library and pass your command as a string to `ffmp`.
 
 ```python
 from ffmperative import ffmp
 
-ffmp("sample the 5th frame from '/path/to/video.mp4'")
+ffmp("sample the 5th frame from '/path/to/video.mp4'", remote=True)
 ```
 
 You can also use the command-line interface:
 ```bash
-ffmp do --p "sample the 5th frame from '/path/to/video.mp4'"
+ffmperative do --p "sample the 5th frame from '/path/to/video.mp4'" --remote
 ```
 
 ### Compose 🎞️ 
 Use the `compose` call to compose clips into an edited video. Use the optional `--prompt` flag to guide the composition by text prompt.
 ```bash
-ffmp compose --clips /path/to/video/dir --output /path/to/my_video.mp4 --prompt "Edit the video for social media"
+ffmperative compose --clips /path/to/video/dir --output /path/to/my_video.mp4 --prompt "Edit the video for social media"
 ```
 
-### Notebooks
-
-Explore our notebooks for practical applications of FFMPerative:
-
-* [Automatically Edit Videos from Google Drive in Colab](https://colab.research.google.com/drive/149byzCNd17dAehVuWXkiFQ2mVe_icLCa?usp=sharing)
-
 ### Resources
-* [Huggingface Transformers Agents](https://huggingface.co/docs/transformers/transformers_agents)
 * [ffmpeg-python](https://github.com/kkroening/ffmpeg-python/)
 * [Sample FFMPerative Dataset](https://huggingface.co/datasets/remyxai/ffmperative-sample)
 * [FFMPerative LLaMA2 checkpoint](https://huggingface.co/remyxai/ffmperative-7b)
+* [Automatically Edit Videos from Google Drive in Colab](https://colab.research.google.com/drive/149byzCNd17dAehVuWXkiFQ2mVe_icLCa?usp=sharing)
 
 ### Community
-
-* [B-Roll](https://b-roll.ai/)
-* [@brollai](https://twitter.com/brollai)
+* [Join us on Discord](https://discord.com/invite/b2yGuCNpuC)

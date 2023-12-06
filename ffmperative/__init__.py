@@ -1,63 +1,72 @@
-from .tools import *
+import os
+import re
+import ast
+import shlex
+import requests
+import subprocess
+import pkg_resources
+from sys import argv
 
-try:
-    from .extras import *
+from . import tools as t
+from .utils import download_model
+from .prompts import MAIN_PROMPT
+from .tool_mapping import generate_tools_mapping
+from .interpretor import evaluate, extract_function_calls
 
-    _extras = True
-except ImportError:
-    _extras = False
+tools = generate_tools_mapping()
 
-from transformers.tools import HfAgent
+def run_local(prompt):
+    model_path = download_model()  # Ensure the model file is downloaded before running ffmp
+    ffmp_path = pkg_resources.resource_filename('ffmperative', 'bin/ffmp')
+    safe_prompt = shlex.quote(prompt)
+    command = '{} -m {} -p "{}"'.format(ffmp_path, model_path, safe_prompt)
 
+    try:
+        result = subprocess.run(command, capture_output=True, text=True, shell=True)
 
-def ffmp(
-    prompt, url_endpoint="https://api-inference.huggingface.co/models/bigcode/starcoder"
-):
-    template = """
-    Human tasks Assistant with a video processing workflows. Assistant uses all tools to generate an execution plan.
+        output = result.stdout
+        return output.split("### Assistant:")[-1].strip()
+    except subprocess.CalledProcessError as e:
+        print(f"Error occurred: {e}")
+        return None
 
-    Tools: <<all_tools>>
+def run_remote(prompt):
+    stop=["Task:"]
+    complete_prompt = MAIN_PROMPT.replace("<<prompt>>", prompt.replace("'", "\\'").replace('"', '\\"'))
+    headers = {"Authorization": f"Bearer {os.environ.get('HF_ACCESS_TOKEN', '')}"}
+    inputs = {
+        "inputs": complete_prompt,
+        "parameters": {"max_new_tokens": 2048, "return_full_text": True, "stop":stop},
+    }
 
-    Task: <<prompt>>
+    response = requests.post("https://api-inference.huggingface.co/models/bigcode/starcoder", json=inputs, headers=headers)
+    if response.status_code == 429:
+        logger.info("Getting rate-limited, waiting a tiny bit before trying again.")
+        time.sleep(1)
+        return run_remote(prompt)
+    elif response.status_code != 200:
+        raise ValueError(f"Error {response.status_code}: {response.json()}")
 
-    Answer:
-    """
+    result = response.json()[0]["generated_text"]
+    for stop_seq in stop:
+        if result.endswith(stop_seq):
+            res = result[: -len(stop_seq)]
+            answer = res.split("Answer:")[-1].strip()
+            return answer 
+    return result
 
-    tools = [
-        AudioAdjustmentTool(),
-        AudioVideoMuxTool(),
-        FFProbeTool(),
-        ImageDirectoryToVideoTool(),
-        ImageToVideoTool(),
-        VideoCropTool(),
-        VideoFlipTool(),
-        VideoFrameSampleTool(),
-        VideoGopChunkerTool(),
-        VideoHTTPServerTool(),
-        VideoLetterBoxingTool(),
-        VideoOverlayTool(),
-        VideoResizeTool(),
-        VideoReverseTool(),
-        VideoRotateTool(),
-        VideoSegmentDeleteTool(),
-        VideoSpeedTool(),
-        VideoStackTool(),
-        VideoTrimTool(),
-        VideoWatermarkTool(),
-    ]
-
-    if _extras:
-        tools += [
-            AudioDemuxTool(),
-            ImageZoomPanTool(),
-            SpeechToSubtitleTool(),
-            VideoAutoCropTool(),
-            VideoCaptionTool(),
-            VideoFrameClassifierTool(),
-            VideoSceneSplitTool(),
-            VideoStabilizationTool(),
-            VideoTransitionTool(),
-        ]
-
-    ffmp = HfAgent(url_endpoint, additional_tools=tools)
-    return ffmp.run(prompt, run_prompt_template=template)
+def ffmp(prompt, remote=False, tools=tools):
+    if remote:
+        parsed_output = run_remote(prompt)
+    else:
+        parsed_output = run_local(prompt)
+    if parsed_output:
+        try:
+            extracted_output = extract_function_calls(parsed_output, tools)
+            parsed_ast = ast.parse(extracted_output)
+            result = evaluate(parsed_ast, tools)
+            return result
+        except SyntaxError as e:
+            print(f"Syntax error in parsed output: {e}")
+    else:
+        return None
