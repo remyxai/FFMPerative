@@ -1,4 +1,4 @@
-# FFMPerative
+# FFMPerative - Chat to Compose Video
 <p align="center">
   <img src="https://github.com/remyxai/FFMPerative/blob/main/assets/ffmperative.gif" height=400px>
   <br>
@@ -8,13 +8,12 @@
 
 </p>
 
-## Chat to Compose Video
 FFMPerative is your copilot for video editing workflows. Powered by Large Language Models (LLMs) through an intuitive chat interface, now you can compose video edits in natural language to do things like:
 
 * Change Speed, Resize, Crop, Flip, Reverse Video/GIF
 * Speech-to-Text Transcription and Closed-Captions
 
-FFMPerative is great at task compositition, just describe your changes like [these examples](https://remyxai.github.io/FFMPerative/).
+Just describe your changes like [these examples](https://remyxai.github.io/FFMPerative/).
 
 ## Setup 
 
@@ -33,27 +32,17 @@ git clone https://github.com/remyxai/FFMPerative.git
 cd FFMPerative && pip install .
 ```
 
-`ffmperative` calls a remote service by default but can call a locally hosted model using the `--local` flag.
-To use the remote option, set an environment variable with a huggingface token:
+`ffmperative` defaults to inference using the local model on CPU.
+To use the remotely hosted endpoint, set an environment variable with a huggingface token:
 
 ```
 export HF_ACCESS_TOKEN=<your-token-here>
 ```
 
+and use the optional `--remote` flag
+
 ## Quickstart
-To sample an image from a video clip, simply run FFMPerative from the command-line:
-
-```bash
-ffmperative do --prompt "sample the 5th frame from /path/to/video.mp4"
-```
-
-Similarly, it's simple to split a long video into short clips via scene detection:
-
-```bash
-ffmperative do --prompt "split the video '/path/to/my_video.mp4' by scene"
-```
-
-Or to add closed-captions with:
+Add closed-captions with:
 
 ```bash
 ffmperative do --prompt "merge subtitles 'captions.srt' with video 'video.mp4' calling it 'video_caps.mp4'"
@@ -67,18 +56,18 @@ Simply import the library and pass your command as a string to `ffmp`.
 ```python
 from ffmperative import ffmp
 
-ffmp("sample the 5th frame from '/path/to/video.mp4'", local=True)
+ffmp("sample the 5th frame from '/path/to/video.mp4'", remote=True)
 ```
 
 You can also use the command-line interface:
 ```bash
-ffmperative do --p "sample the 5th frame from '/path/to/video.mp4'" --local
+ffmperative do --p "sample the 5th frame from '/path/to/video.mp4'" --remote
 ```
 
 ### Compose 🎞️ 
 Use the `compose` call to compose clips into an edited video. Use the optional `--prompt` flag to guide the composition by text prompt.
 ```bash
-ffmperative compose --clips /path/to/video/dir --output /path/to/my_video.mp4 --prompt "Edit the video for social media" --local
+ffmperative compose --clips /path/to/video/dir --output /path/to/my_video.mp4 --prompt "Edit the video for social media"
 ```
 
 ### Resources

@@ -55,11 +55,11 @@ def run_remote(prompt):
             return answer 
     return result
 
-def ffmp(prompt, local=False, tools=tools):
-    if local:
-        parsed_output = run_local(prompt)
-    else:
+def ffmp(prompt, remote=False, tools=tools):
+    if remote:
         parsed_output = run_remote(prompt)
+    else:
+        parsed_output = run_local(prompt)
     if parsed_output:
         try:
             extracted_output = extract_function_calls(parsed_output, tools)
