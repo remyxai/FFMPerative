@@ -59,11 +59,6 @@ from ffmperative import ffmp
 ffmp("sample the 5th frame from '/path/to/video.mp4'", remote=True)
 ```
 
-You can also use the command-line interface:
-```bash
-ffmperative do --p "sample the 5th frame from '/path/to/video.mp4'" --remote
-```
-
 ### Compose 🎞️ 
 Use the `compose` call to compose clips into an edited video. Use the optional `--prompt` flag to guide the composition by text prompt.
 ```bash
