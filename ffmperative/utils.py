@@ -7,6 +7,17 @@ import subprocess
 
 from pathlib import Path
 
+def download_ffmp():
+    ffmp_path = os.path.join(os.path.dirname(__file__), 'bin', 'ffmp')
+    if not os.path.exists(ffmp_path):
+        print("Downloading ffmp...")
+        model_url = "https://remyx.ai/assets/ffmperative/v0.0.7/ffmp"
+        response = requests.get(model_url, stream=True)
+        with open(ffmp_path, 'wb') as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                f.write(chunk)
+        print("Download complete.")
+
 def extract_and_encode_frame(video_path):
     # Get the duration of the video
     probe = ffmpeg.probe(video_path)

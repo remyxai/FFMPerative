@@ -1,5 +1,4 @@
 import os
-import requests
 from setuptools import setup, find_packages
 from setuptools.command.install import install
 
@@ -20,25 +19,9 @@ class CustomInstall(install):
         bin_dir = os.path.join(self.install_lib, 'ffmperative', 'bin')
         os.makedirs(bin_dir, exist_ok=True)
 
-        # Download the model
-        self.download_model(bin_dir)
-
         # Call the standard install command
         install.run(self)
 
-    @staticmethod
-    def download_model(bin_dir):
-        model_url = f"https://remyx.ai/assets/ffmperative/{version}/ffmp"
-        target_path = os.path.join(bin_dir, 'ffmp')
-
-        if not os.path.exists(target_path):
-            print("Downloading model assets...")
-            response = requests.get(model_url, stream=True)
-            with open(target_path, 'wb') as f:
-                for chunk in response.iter_content(chunk_size=8192):
-                    f.write(chunk)
-            print("Download complete.")
-        return target_path
 
 setup(
     name="ffmperative",
