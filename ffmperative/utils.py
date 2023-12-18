@@ -18,7 +18,7 @@ def download_ffmp():
     # Download ffmp file if it does not exist
     if not os.path.exists(ffmp_path):
         print("Downloading ffmp...")
-        model_url = "https://remyx.ai/assets/ffmperative/v0.0.7/ffmp"
+        model_url = "https://remyx.ai/assets/ffmperative/0.0.7/ffmp"
         response = requests.get(model_url, stream=True)
         with open(ffmp_path, 'wb') as f:
             for chunk in response.iter_content(chunk_size=8192):
