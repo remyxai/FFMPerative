@@ -9,12 +9,14 @@ from sys import argv
 
 from . import tools as t
 from .prompts import MAIN_PROMPT
+from .utils import download_ffmp
 from .tool_mapping import generate_tools_mapping
 from .interpretor import evaluate, extract_function_calls
 
 tools = generate_tools_mapping()
 
 def run_local(prompt):
+    download_ffmp()
     ffmp_path = pkg_resources.resource_filename('ffmperative', 'bin/ffmp')
     safe_prompt = shlex.quote(prompt)
     command = '{} -p "{}"'.format(ffmp_path, safe_prompt)
