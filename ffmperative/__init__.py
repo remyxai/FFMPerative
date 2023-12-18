@@ -8,7 +8,6 @@ import pkg_resources
 from sys import argv
 
 from . import tools as t
-from .utils import download_model
 from .prompts import MAIN_PROMPT
 from .tool_mapping import generate_tools_mapping
 from .interpretor import evaluate, extract_function_calls
@@ -16,16 +15,15 @@ from .interpretor import evaluate, extract_function_calls
 tools = generate_tools_mapping()
 
 def run_local(prompt):
-    model_path = download_model()  # Ensure the model file is downloaded before running ffmp
     ffmp_path = pkg_resources.resource_filename('ffmperative', 'bin/ffmp')
     safe_prompt = shlex.quote(prompt)
-    command = '{} -m {} -p "{}"'.format(ffmp_path, model_path, safe_prompt)
+    command = '{} -p "{}"'.format(ffmp_path, safe_prompt)
 
     try:
         result = subprocess.run(command, capture_output=True, text=True, shell=True)
 
         output = result.stdout
-        return output.split("### Assistant:")[-1].strip()
+        return output
     except subprocess.CalledProcessError as e:
         print(f"Error occurred: {e}")
         return None

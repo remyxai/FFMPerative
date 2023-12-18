@@ -13,16 +13,17 @@ class InterpretorError(ValueError):
 
     pass
 
-def extract_function_calls(text, tools):
-    # Define the regex pattern for matching function names
-    pattern = '|'.join(re.escape(tool) for tool in tools)
 
-    # Find all occurrences of the tool names
-    tool_occurrences = [(m.start(), m.group()) for m in re.finditer(pattern, text)]
+def extract_function_calls(text, tools):
+    # Update the regex pattern to match tool names followed by an opening parenthesis
+    pattern = r'(' + '|'.join(re.escape(tool) for tool in tools) + r')\('
+
+    # Find all occurrences of the tool function calls
+    matches = re.finditer(pattern, text)
 
     function_calls = []
-    for start, tool in tool_occurrences:
-        # Find the opening parenthesis of the function call
+    for match in matches:
+        start = match.start()
         open_paren = text.find('(', start)
         if open_paren == -1:
             continue
