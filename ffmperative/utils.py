@@ -8,7 +8,14 @@ import subprocess
 from pathlib import Path
 
 def download_ffmp():
-    ffmp_path = os.path.join(os.path.dirname(__file__), 'bin', 'ffmp')
+    bin_dir = os.path.join(os.path.dirname(__file__), 'bin')
+    ffmp_path = os.path.join(bin_dir, 'ffmp')
+
+    # Create the 'bin/' directory if it does not exist
+    if not os.path.exists(bin_dir):
+        os.makedirs(bin_dir, exist_ok=True)
+
+    # Download ffmp file if it does not exist
     if not os.path.exists(ffmp_path):
         print("Downloading ffmp...")
         model_url = "https://remyx.ai/assets/ffmperative/v0.0.7/ffmp"
