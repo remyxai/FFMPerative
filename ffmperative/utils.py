@@ -24,6 +24,14 @@ def download_ffmp():
             for chunk in response.iter_content(chunk_size=8192):
                 f.write(chunk)
         print("Download complete.")
+    else:
+        pass
+
+    # Check if the file is executable, and make it executable if it's not
+    if not os.access(ffmp_path, os.X_OK):
+        print("Making ffmp executable...")
+        os.chmod(ffmp_path, 0o755)  # Sets the file to be readable and executable by everyone, and writable by the owner.
+        print("ffmp is now executable.")
 
 def extract_and_encode_frame(video_path):
     # Get the duration of the video
