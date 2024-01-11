@@ -31,7 +31,7 @@ def main():
             try:
                 ffmp(plan, args.remote)                
             except:
-                print("plan: ", plan)        
+                print("skipped plan: ", plan)        
         results = process_and_concatenate_clips(join_plan, args.output)
         pprint(results)
     else:

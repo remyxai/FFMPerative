@@ -466,6 +466,7 @@ class VideoStackTool(Tool):
 
 
 class VideoTrimTool(Tool):
+    name = "VideoTrimTool"
     description = """
     This tool trims a video. Inputs are input_path, output_path, 
     start_time, and end_time. Format start(end)_time: HH:MM:SS
@@ -476,6 +477,8 @@ class VideoTrimTool(Tool):
     def __call__(
         self, input_path: str, output_path: str, start_time: str, end_time: str
     ):
+        start_time=start_time.replace("-","")
+        end_time=end_time.replace("-", "")
         stream = ffmpeg.input(input_path)
         v = stream.trim(start=start_time, end=end_time).setpts("PTS-STARTPTS")
         if has_audio(input_path):

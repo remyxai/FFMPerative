@@ -36,7 +36,7 @@ def run_remote(prompt):
     headers = {"Authorization": f"Bearer {os.environ.get('HF_ACCESS_TOKEN', '')}"}
     inputs = {
         "inputs": complete_prompt,
-        "parameters": {"max_new_tokens": 2048, "return_full_text": True, "stop":stop},
+        "parameters": {"max_new_tokens": 192, "return_full_text": True, "stop":stop},
     }
 
     response = requests.post("https://api-inference.huggingface.co/models/bigcode/starcoder", json=inputs, headers=headers)

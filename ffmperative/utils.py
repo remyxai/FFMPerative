@@ -130,7 +130,18 @@ def process_and_concatenate_clips(videos_string, output_path="composed_video.mp4
     # Cleanup
     for clip in processed_clips:
         clip.unlink()
+
+    # Delete all contents of the directory
+    for item in processed_clips_dir.iterdir():
+        if item.is_dir():
+            shutil.rmtree(item)
+        else:
+            item.unlink()
+
+    # Now safely remove the directory
     processed_clips_dir.rmdir()
+
+    # Remove the files.txt
     Path("files.txt").unlink()
 
     # Additionally, delete the original clip files
