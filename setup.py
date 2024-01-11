@@ -14,7 +14,7 @@ def read_requirements(file):
 
 setup(
     name="ffmperative",
-    version="0.0.7",
+    version="0.0.7-1",
     packages=find_packages(),
     include_package_data=True,
     install_requires=read_requirements((this_directory / 'requirements.txt')),
