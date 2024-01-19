@@ -32,15 +32,6 @@ git clone https://github.com/remyxai/FFMPerative.git
 cd FFMPerative && pip install .
 ```
 
-`ffmperative` defaults to inference using the local model on CPU.
-To use the remotely hosted endpoint, set an environment variable with a huggingface token:
-
-```
-export HF_ACCESS_TOKEN=<your-token-here>
-```
-
-and use the optional `--remote` flag
-
 ## Quickstart
 Add closed-captions with:
 
@@ -56,7 +47,7 @@ Simply import the library and pass your command as a string to `ffmp`.
 ```python
 from ffmperative import ffmp
 
-ffmp("sample the 5th frame from '/path/to/video.mp4'", remote=True)
+ffmp("sample the 5th frame from '/path/to/video.mp4'")
 ```
 
 ### Compose 🎞️ 
