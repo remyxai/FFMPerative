@@ -1,0 +1,25 @@
+# Installed by Remyx (https://engine.remyx.ai).
+# Opens a weekly draft PR integrating the next recommended arXiv paper for your
+# research interest. See https://github.com/remyxai/outrider for the action.
+name: Remyx Recommendation
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'  # Mondays 06:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  remyx-recommendation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: remyxai/outrider@v1
+        with:
+          interest-id: '2e0373fd-0bbc-49a9-9e35-5ba0043a2413'
+        env:
+          REMYX_API_KEY: ${{ secrets.REMYX_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
