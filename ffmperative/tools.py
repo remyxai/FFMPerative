@@ -1,7 +1,13 @@
 import math
 import json
-import ffmpeg
-from PIL import Image
+try:
+    import ffmpeg
+except ImportError:  # ffmpeg-python is only needed when a tool actually runs
+    ffmpeg = None
+try:
+    from PIL import Image
+except ImportError:  # Pillow is only needed when a tool actually runs
+    Image = None
 from io import BytesIO
 from pathlib import Path
 

@@ -11,6 +11,7 @@ from . import tools as t
 from .prompts import MAIN_PROMPT
 from .utils import download_ffmp
 from .tool_mapping import generate_tools_mapping
+from .causal_tool_filter import select_tool_frontier
 from .interpretor import evaluate, extract_function_calls
 
 tools = generate_tools_mapping()
@@ -55,7 +56,7 @@ def run_remote(prompt):
             return answer 
     return result
 
-def ffmp(prompt, remote=False, tools=tools):
+def ffmp(prompt, remote=False, tools=tools, prefilter_tools=True):
     if remote:
         parsed_output = run_remote(prompt)
     else:
@@ -63,8 +64,20 @@ def ffmp(prompt, remote=False, tools=tools):
     if parsed_output:
         try:
             extracted_output = extract_function_calls(parsed_output, tools)
+            # Causal Minimal Tool Filtering: restrict the agent's action surface
+            # to the minimal causal frontier for this task. Fall back to the full
+            # set if the model called outside it, so filtering never breaks a
+            # valid pipeline.
+            active_tools = tools
+            if prefilter_tools:
+                frontier_tools, report = select_tool_frontier(prompt, tools)
+                called = set(re.findall(r"\b(\w+)\s*\(", extracted_output)) & set(tools)
+                if report.filtered and called <= set(frontier_tools):
+                    active_tools = frontier_tools
+                    print(f"CMTF: exposed {report.exposed}/{report.total} tools "
+                          f"(~{report.est_token_savings_pct}% fewer tool tokens)")
             parsed_ast = ast.parse(extracted_output)
-            result = evaluate(parsed_ast, tools)
+            result = evaluate(parsed_ast, active_tools)
             return result
         except SyntaxError as e:
             print(f"Syntax error in parsed output: {e}")

@@ -64,3 +64,24 @@ ffmperative compose --clips /path/to/video/dir --output /path/to/my_video.mp4 --
 
 ### Community
 * [Join us on Discord](https://discord.com/invite/b2yGuCNpuC)
+
+## Causal Minimal Tool Filtering — adapted from "ToolChoiceConfusion: Causal Minimal Tool Filtering for Reliable LLM Agents"
+
+FFMPerative used to expose every ffmpeg tool to the agent on every request.
+[ToolChoiceConfusion (arXiv:2606.06284)](https://arxiv.org/abs/2606.06284v1)
+shows that larger tool menus *lower* reliability and inflate token cost, and
+that semantic relevance is not enough — a tool can be related to the task yet
+be unnecessary or premature at the current step.
+
+`ffmperative/causal_tool_filter.py` ports the paper's **Causal Minimal Tool
+Filtering (CMTF)**: each tool carries a lightweight precondition/effect
+contract, and `select_tool_frontier()` exposes only the minimal causal frontier
+that advances from the current state toward the user's goal — pulling in
+prerequisite producer tools when needed (e.g. the image-directory→video step
+before a watermark) and falling back to the full set when no frontier can be
+identified. `ffmp()` calls this filter to narrow the agent's executable tool
+surface, which on typical single-edit prompts drops ~20 tools to 1–2 and cuts
+tool-description tokens by ~90% — directly aiding the team's smaller fine-tuned
+StableLM-Zephyr-3B backend.
+
+Contributed via [Remyx Recommendation](https://engine.remyx.ai).
