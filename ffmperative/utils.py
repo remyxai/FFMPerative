@@ -1,5 +1,8 @@
 import os
-import ffmpeg
+try:
+    import ffmpeg
+except ImportError:  # ffmpeg-python is only needed for actual video processing
+    ffmpeg = None
 import base64
 import json
 import requests
