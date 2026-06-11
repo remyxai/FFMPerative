@@ -64,3 +64,19 @@ ffmperative compose --clips /path/to/video/dir --output /path/to/my_video.mp4 --
 
 ### Community
 * [Join us on Discord](https://discord.com/invite/b2yGuCNpuC)
+
+### Edit-Plan Verification — adapted from [Aurora: Unified Video Editing with a Tool-Using Agent](https://arxiv.org/abs/2605.18748)
+
+Aurora pairs a tool-using VLM agent with a video generator and shows that
+mapping a raw user request into a *structured, complete edit plan* — resolving
+underspecification **before** generation — improves instruction-following.
+FFMPerative adopts that idea at the point where the agent's generated tool
+sequence is about to run: `ffmperative/edit_plan_check.py` parses the plan into
+structured steps and verifies each one against the available tools, surfacing
+**unknown tools** and **missing required arguments** before any `ffmpeg`
+primitive executes. The check is wired into `interpretor.evaluate`, so every
+plan is validated on the normal execution path. The diffusion/generation half
+of Aurora is out of scope — FFMPerative composes `ffmpeg` primitives, so the
+value is plan completeness over those primitives.
+
+Contributed via [Remyx Recommendation](https://engine.remyx.ai).
